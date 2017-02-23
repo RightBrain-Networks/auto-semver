@@ -17,5 +17,4 @@ RUN chown -R semver:semver /semver && chmod -R ug+x /semver/*
 
 RUN pip install -r requirements.txt
 
-#CMD python get_version.py
-CMD tail -f get_version.py
+CMD python semver.py && python get_version.py

@@ -3,7 +3,7 @@ from ConfigParser import ConfigParser
 
 def get_version():
     config = ConfigParser()
-    config.read('.bumpversion.cfg')
+    config.read('/application_repo/.bumpversion.cfg')
     version = config.get('bumpversion', 'current_version')
     return version
 
