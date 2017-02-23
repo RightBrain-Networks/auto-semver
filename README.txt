@@ -1,3 +1,3 @@
 Semantic Versioning
 
-1
+2
