@@ -72,10 +72,6 @@ class SemVer(object):
         return self
 
     def commit_and_push(self):
-        '''
-        ' this will be difficult to do because we'd need to setup credentials in
-        '  docker container for git remote repo access
-        '
         # push versioning commit
         p = subprocess.Popen(['git', 'push', 'origin', 'develop'],
                              cwd='/application_repo')
@@ -85,7 +81,6 @@ class SemVer(object):
         p = subprocess.Popen(['git', 'push', 'origin', '--tags'],
                              cwd='/application_repo')
         p.wait()
-        '''
         return self
 
     # 1) get branches from last commit message
@@ -101,8 +96,12 @@ class SemVer(object):
             raise Exception('No git flow branch found')
         self.setup_git_user()
         self.version_repo()
+        self.commit_and_push()
         return self
 
 
 if __name__ == '__main__':
-    SemVer().run()
+    try:
+        SemVer().run()
+    except Exception as e:
+        print e.message
