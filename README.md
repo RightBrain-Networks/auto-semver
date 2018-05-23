@@ -1,9 +1,7 @@
-Semantic Versioning
-----------
+# Semantic Versioning
 
 
-Usage
------
+# Usage
 
 # FULL_PATH_TO_LOCAL_REPO gives container access to repo to be versioned
 # FULL_PATH_TO_SSH_FOLDER gives container access to ssh keys to be able to push repo

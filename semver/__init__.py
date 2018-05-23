@@ -2,6 +2,7 @@ import re
 import subprocess
 from ConfigParser import ConfigParser
 
+version = "1.0.4"
 
 class SemVer(object):
 
@@ -19,7 +20,7 @@ class SemVer(object):
 
     def _setting_to_array(self, setting):
         config = ConfigParser()
-        config.read('/application_repo/.bumpversion.cfg')
+        config.read('./.bumpversion.cfg')
         value = config.get('semver', setting)
         # filter() removes empty string which is what we get if setting is blank
         return filter(bool, [v.strip() for v in value.split(',')])
@@ -27,7 +28,7 @@ class SemVer(object):
     # based on commit message see what branches are involved in the merge
     def get_branches(self):
         p = subprocess.Popen(['git', 'log', '-1'], stdout=subprocess.PIPE,
-                             cwd='/application_repo')
+                             cwd='.')
         message = p.stdout.read()
         matches = self.GET_COMMIT_MESSAGE.search(message)
         if matches:
@@ -56,10 +57,10 @@ class SemVer(object):
         # setup git user
         p = subprocess.Popen(['git', 'config', 'user.email',
                               '"versioner@semver.com"'],
-                             cwd='/application_repo')
+                             cwd='.')
         p = subprocess.Popen(['git', 'config', 'user.name',
                               '"Semantic Versioner"'],
-                             cwd='/application_repo')
+                             cwd='.')
         p.wait()
         return self
 
@@ -67,19 +68,19 @@ class SemVer(object):
     def version_repo(self):
         # version repo
         p = subprocess.Popen(['bumpversion', self.version_type],
-                             cwd='/application_repo')
+                             cwd='.')
         p.wait()
         return self
 
     def commit_and_push(self):
         # push versioning commit
         p = subprocess.Popen(['git', 'push', 'origin', 'develop'],
-                             cwd='/application_repo')
+                             cwd='.')
         p.wait()
 
         # push versioning tag
         p = subprocess.Popen(['git', 'push', 'origin', '--tags'],
-                             cwd='/application_repo')
+                             cwd='.')
         p.wait()
         return self
 
@@ -99,9 +100,12 @@ class SemVer(object):
         self.commit_and_push()
         return self
 
-
-if __name__ == '__main__':
+def main():
     try:
         SemVer().run()
     except Exception as e:
         print e.message
+
+if __name__ == '__main__':
+    try: main()
+    except: raise

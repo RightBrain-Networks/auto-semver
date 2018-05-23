@@ -13,8 +13,8 @@ RUN useradd -d /semver semver
 WORKDIR /semver
 
 ADD ./ /semver
-RUN chown -R semver:semver /semver && chmod -R ug+x /semver/*
 
-RUN pip install -r requirements.txt
+RUN python setup.py sdist 
+RUN pip install dist/semver-1.0.4.tar.gz
 
-CMD python semver.py && python get_version.py
+CMD semver && semver_get_version
