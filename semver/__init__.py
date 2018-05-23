@@ -1,6 +1,10 @@
 import re
 import subprocess
-from ConfigParser import ConfigParser
+try: 
+    from configparser import ConfigParser
+except ImportError:
+    # Python < 3
+    from ConfigParser import ConfigParser
 
 version = "1.0.4"
 
@@ -29,7 +33,7 @@ class SemVer(object):
     def get_branches(self):
         p = subprocess.Popen(['git', 'log', '-1'], stdout=subprocess.PIPE,
                              cwd='.')
-        message = p.stdout.read()
+        message = str(p.stdout.read())
         matches = self.GET_COMMIT_MESSAGE.search(message)
         if matches:
             self.merged_branch = matches.group(1)
@@ -104,7 +108,7 @@ def main():
     try:
         SemVer().run()
     except Exception as e:
-        print(e.message)
+        print(e)
 
 if __name__ == '__main__':
     try: main()

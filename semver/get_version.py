@@ -1,4 +1,8 @@
-from ConfigParser import ConfigParser
+try:
+    from configparser import ConfigParser
+except ImportError:
+    # Python < 3
+    from ConfigParser import ConfigParser
 
 
 def get_version():
