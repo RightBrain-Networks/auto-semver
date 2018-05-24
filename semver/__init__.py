@@ -18,7 +18,7 @@ class SemVer(object):
         self.main_branch = None
         self.version_type = None
 
-        self.main_branches = ['development', 'env-test', 'env-stage', 'env-prod']
+        self.main_branches = ['develop', 'env-test', 'env-stage', 'env-prod']
         self.major_branches = []
         self.minor_branches = ['feature', 'RightBrain-Networks/feature']
         self.patch_branches = ['hotfix', 'bugfix']
