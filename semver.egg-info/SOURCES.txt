@@ -1,0 +1,10 @@
+README.rst
+setup.py
+semver/__init__.py
+semver/get_version.py
+semver.egg-info/PKG-INFO
+semver.egg-info/SOURCES.txt
+semver.egg-info/dependency_links.txt
+semver.egg-info/entry_points.txt
+semver.egg-info/requires.txt
+semver.egg-info/top_level.txt
