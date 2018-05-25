@@ -11,7 +11,7 @@ version = "1.0.5"
 class SemVer(object):
 
     GET_COMMIT_MESSAGE = re.compile(r"Merge (branch|pull request) '?(.+)'? (into|from) ([\w/-]+)")
-     #Merge pull request #1 from RightBrain-Networks/feature/PLAT-185-versioning
+    # Merge pull request #1 from RightBrain-Networks/feature/PLAT-185-versioning
 
     def __init__(self):
         self.merged_branch = None
@@ -39,10 +39,8 @@ class SemVer(object):
         b = subprocess.Popen(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], stdout=subprocess.PIPE,
                              cwd='.')
         message = str(p.stdout.read())
-        br = b.stdout.read().decode('utf-8')
-        #remove newline
-        branch=br.rstrip()
-        print("Main branch is "+branch)
+        br = b.stdout.read().decode('utf-8').rstrip()
+        print('Main branch is ' + branch)
         matches = self.GET_COMMIT_MESSAGE.search(message)
         if matches:
             if str(matches.group(4)) == branch:
@@ -50,16 +48,11 @@ class SemVer(object):
             else:
                 self.merged_branch = matches.group(4)
             self.main_branch = branch
-            #print("group1 "+matches.group(1))
-            #print("group2 "+matches.group(2))
-            #print("group3 "+matches.group(3))
-            #print("group4 "+matches.group(4))
-        
         return bool(matches)
 
     # based on branches involved see what type of versioning should be done
     def get_version_type(self):
-        print("Merged branch is "+self.merged_branch)
+        print('Merged branch is ' + self.merged_branch)
         for prefix in self.major_branches:
             if self.merged_branch.startswith(prefix + '/'):
                 self.version_type = 'major'
