@@ -13,6 +13,7 @@ RUN useradd -d /semver semver
 WORKDIR /semver
 
 ADD ./ /semver
+RUN chmod -R +r /semver && chmod +x /semver
 
 RUN pip install -e .
 
