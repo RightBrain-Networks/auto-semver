@@ -18,20 +18,17 @@ class SemVer(object):
         self.main_branch = None
         self.version_type = None
 
-        self.main_branches = ['develop', 'env-test', 'env-stage', 'env-prod']
-        self.major_branches = []
-        self.minor_branches = ['feature', 'RightBrain-Networks/feature']
-        self.patch_branches = ['hotfix', 'bugfix']
+        self.main_branches = self._setting_to_array('main_branches')
+        self.major_branches = self._setting_to_array('major_branches')
+        self.minor_branches = self._setting_to_array('minor_branches')
+        self.patch_branches = self._setting_to_array('patch_branches')
 
-    #def _setting_to_array(self, setting):
-     #   config = ConfigParser()
-     #   config.read('./.bumpversion.cfg')
-     #   value = config.get('semver', setting)
-     #   print(str(value))
-        
-        #return value.split(',')
+    def _setting_to_array(self, setting):
+        config = ConfigParser()
+        config.read('./.bumpversion.cfg')
+        value = config.get('semver', setting)
         # filter() removes empty string which is what we get if setting is blank
-        #return [v.strip() for v in value.split(',')]
+        return list(filter(bool, [v.strip() for v in value.split(',')]))
 
     # based on commit message see what branches are involved in the merge
     
@@ -62,6 +59,7 @@ class SemVer(object):
 
     # based on branches involved see what type of versioning should be done
     def get_version_type(self):
+        print("Merged branch is "+self.merged_branch)
         for prefix in self.major_branches:
             if self.merged_branch.startswith(prefix + '/'):
                 self.version_type = 'major'
@@ -113,7 +111,6 @@ class SemVer(object):
     # 3) see what type of versioning we should do
     # 4) version the repo
     def run(self):
-        print(self.main_branches)
         if not self.get_branches():
             raise Exception('No merge found')
         if self.main_branch not in self.main_branches:
