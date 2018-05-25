@@ -1,3 +1,4 @@
 *.swp
 *.orig
 *.DS_Store
+dist/
