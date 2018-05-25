@@ -1,4 +1,0 @@
-[console_scripts]
-semver = semver:main
-semver_get_version = semver.get_version:main
-
