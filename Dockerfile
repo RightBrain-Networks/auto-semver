@@ -14,7 +14,6 @@ WORKDIR /semver
 
 ADD ./ /semver
 
-RUN python setup.py sdist 
-RUN pip install dist/semver-1.0.4.tar.gz
+RUN pip install -e .
 
 CMD semver && semver_get_version
