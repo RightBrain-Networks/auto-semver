@@ -11,7 +11,7 @@ version = "1.0.5"
 class SemVer(object):
 
     GET_COMMIT_MESSAGE = re.compile(r"Merge (branch|pull request) '?(.+)'? (into|from) ([\w/-]+)")
-     #Merge pull request #1 from RightBrain-Networks/feature/PLAT-185-versioning
+    # Merge pull request #1 from RightBrain-Networks/feature/PLAT-185-versioning
 
     def __init__(self):
         self.merged_branch = None
