@@ -1,3 +1,4 @@
+import argparse
 import re
 import subprocess
 try: 
@@ -6,7 +7,7 @@ except ImportError:
     # Python < 3
     from ConfigParser import ConfigParser
 
-version = "1.0.5"
+version = "1.0.6"
 
 class SemVer(object):
 
@@ -103,7 +104,7 @@ class SemVer(object):
     # 2) see if we're merging into a main branch
     # 3) see what type of versioning we should do
     # 4) version the repo
-    def run(self):
+    def run(self,push=True):
         if not self.get_branches():
             raise Exception('No merge found')
         if self.main_branch not in self.main_branches:
@@ -112,12 +113,16 @@ class SemVer(object):
             raise Exception('No git flow branch found')
         self.setup_git_user()
         self.version_repo()
-        self.commit_and_push()
+        if push:
+            self.commit_and_push()
         return self
 
 def main():
     try:
-        SemVer().run()
+        parser = argparse.ArgumentParser(description='Bump Semantic Version.')
+        parser.add_argument('-n','--no-push', help='Do not try to push', action='store_false', dest='push')
+        args = parser.parse_args()
+        SemVer().run(push=args.push)
     except Exception as e:
         print(e)
 

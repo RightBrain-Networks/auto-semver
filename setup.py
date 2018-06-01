@@ -98,7 +98,8 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'bumpversion==0.5.3'
+        'bumpversion==0.5.3',
+        'argparse>=1.2.1'
     ],
 
     # List additional groups of dependencies here (e.g. development
