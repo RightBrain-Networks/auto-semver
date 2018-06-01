@@ -39,7 +39,7 @@ class SemVer(object):
         b = subprocess.Popen(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], stdout=subprocess.PIPE,
                              cwd='.')
         message = str(p.stdout.read())
-        br = b.stdout.read().decode('utf-8').rstrip()
+        branch = b.stdout.read().decode('utf-8').rstrip()
         print('Main branch is ' + branch)
         matches = self.GET_COMMIT_MESSAGE.search(message)
         if matches:
