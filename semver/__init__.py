@@ -9,6 +9,12 @@ except ImportError:
 
 version = "1.0.7"
 
+
+# Define common exceptions;
+NO_MERGE_FOUND = Exception('No merge found')
+NOT_MAIN_BRANCH = Exception('Not merging into a main branch')
+NO_GIT_FLOW = Exception('No git flow branch found')
+
 class SemVer(object):
 
     GET_COMMIT_MESSAGE = re.compile(r"Merge (branch|pull request) '?(.+)'? (into|from) ([\w/-]+)")
@@ -106,11 +112,11 @@ class SemVer(object):
     # 4) version the repo
     def run(self,push=True):
         if not self.get_branches():
-            raise Exception('No merge found')
+            raise NO_MERGE_FOUND
         if self.main_branch not in self.main_branches:
-            raise Exception('Not merging into a main branch')
+            raise NOT_MAIN_BRANCH
         if not self.get_version_type():
-            raise Exception('No git flow branch found')
+            raise NO_GIT_FLOW
         if push:
             self.setup_git_user()
         self.version_repo()
@@ -126,7 +132,14 @@ def main():
         SemVer().run(push=args.push)
     except Exception as e:
         print(e)
-        exit(1)
+        if e == NO_MERGE_FOUND:
+            exit(1)
+        elif e == NOT_MAIN_BRANCH:
+            exit(2)
+        elif e == NO_GIT_FLOW:
+            exit(3)
+        else:
+            exit(128)
 
 if __name__ == '__main__':
     try: main()
