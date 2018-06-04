@@ -111,7 +111,8 @@ class SemVer(object):
             raise Exception('Not merging into a main branch')
         if not self.get_version_type():
             raise Exception('No git flow branch found')
-        self.setup_git_user()
+        if push:
+            self.setup_git_user()
         self.version_repo()
         if push:
             self.commit_and_push()
@@ -125,6 +126,7 @@ def main():
         SemVer().run(push=args.push)
     except Exception as e:
         print(e)
+        exit(1)
 
 if __name__ == '__main__':
     try: main()
