@@ -7,7 +7,7 @@ except ImportError:
     # Python < 3
     from ConfigParser import ConfigParser
 
-version = "1.0.7"
+version = "1.0.8"
 
 
 # Define common exceptions;
