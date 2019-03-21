@@ -7,7 +7,7 @@ except ImportError:
     # Python < 3
     from ConfigParser import ConfigParser
 
-version = "1.0.8"
+version = "1.0.9"
 
 
 # Define common exceptions;
@@ -20,7 +20,8 @@ class SemVer(object):
     GET_COMMIT_MESSAGE = re.compile(r"Merge (branch|pull request) '?(.+)'? (into|from) ([\w/-]+)")
     # Merge pull request #1 from RightBrain-Networks/feature/PLAT-185-versioning
 
-    def __init__(self):
+    def __init__(self,global_user=False):
+        self.global_user = '--local' if global_user else '--global'
         self.merged_branch = None
         self.main_branch = None
         self.version_type = None
@@ -77,10 +78,10 @@ class SemVer(object):
     # setup git settings so we can commit and tag
     def setup_git_user(self):
         # setup git user
-        p = subprocess.Popen(['git', 'config', 'user.email',
+        p = subprocess.Popen(['git', 'config', self.global_user, 'user.email',
                               '"versioner@semver.com"'],
                              cwd='.')
-        p = subprocess.Popen(['git', 'config', 'user.name',
+        p = subprocess.Popen(['git', 'config', self.global_user, 'user.name',
                               '"Semantic Versioner"'],
                              cwd='.')
         p.wait()
@@ -128,8 +129,9 @@ def main():
     try:
         parser = argparse.ArgumentParser(description='Bump Semantic Version.')
         parser.add_argument('-n','--no-push', help='Do not try to push', action='store_false', dest='push')
+        parser.add_argument('-g','--global-user', help='Set git user at a global level, helps in jenkins', action='store_true', dest='global_user')
         args = parser.parse_args()
-        SemVer().run(push=args.push)
+        SemVer(global_user=args.global_user).run(push=args.push)
     except Exception as e:
         print(e)
         if e == NO_MERGE_FOUND:
