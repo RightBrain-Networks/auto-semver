@@ -10,10 +10,17 @@ pipeline {
     DOCKER_REGISTRY = '356438515751.dkr.ecr.us-east-1.amazonaws.com'
   }
   stages {
+    stage("Docker ECR")
+    {
+        steps
+        {
+            sh "docker pull 356438515751.dkr.ecr.us-east-1.amazonaws.com/auto-semver"
+        }
+    }
     stage('Version') {
         agent {
             docker {
-                image '356438515751.dkr.ecr.us-east-1.amazonaws.com:auto-semver'
+                image 'auto-semver'
             }
         }
       steps {
