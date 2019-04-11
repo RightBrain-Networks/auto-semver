@@ -27,7 +27,10 @@ pipeline {
       steps {
         // runs the automatic semver tool which will version, & tag,
         runAutoSemver()
-        VERSION = $(getVersion('-d'))
+        script
+        {
+            VERSION = $(getVersion('-d'))
+        }
       }
     }
     stage('Build') {
