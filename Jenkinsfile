@@ -20,7 +20,7 @@ pipeline {
     stage('Version') {
         agent {
             docker {
-                image 'auto-semver'
+                image 'auto-semver:HEAD'
             }
         }
       steps {
