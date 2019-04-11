@@ -48,20 +48,21 @@ pipeline {
         //sh "aws s3 cp ${env.SERVICE}-${getVersion('-d')}.tar.gz s3://rbn-ops-pkg-us-east-1/${env.SERVICE}/${env.SERVICE}-${getVersion('-d')}.tar.gz"
         
       }
-    }
-    post{
+      post
+      {
         // Update Git with status of push stage.
         success {
-          updateGithubCommitStatus(GITHUB_URL, 'Passed push stage', 'SUCCESS', 'Push')
+            updateGithubCommitStatus(GITHUB_URL, 'Passed push stage', 'SUCCESS', 'Push')
         }
         failure {
-          updateGithubCommitStatus(GITHUB_URL, 'Failed push stage', 'FAILURE', 'Push')
+            updateGithubCommitStatus(GITHUB_URL, 'Failed push stage', 'FAILURE', 'Push')
         }
       }
-  }
-  post {
-    always {
-      removeDockerImages()
     }
-  }
+    post {
+        always {
+            removeDockerImages()
+            cleanWs()
+        }
+    }
 }
