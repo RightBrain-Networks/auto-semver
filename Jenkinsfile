@@ -42,7 +42,7 @@ pipeline {
       steps {     
         withEcr {
             //sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:${getVersion('-d')}"
-            sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:selfversion"
+            sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:SELFVERSION"
         }
         
         //Copy tar.gz file to s3 bucket
