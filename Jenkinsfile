@@ -11,6 +11,11 @@ pipeline {
   }
   stages {
     stage('Version') {
+        agent {
+            docker {
+                image '356438515751.dkr.ecr.us-east-1.amazonaws.com:auto-semver'
+            }
+        }
       steps {
         // runs the automatic semver tool which will version, & tag,
         runAutoSemver()
@@ -18,7 +23,6 @@ pipeline {
     }
     stage('Build') {
       steps {
-
 
         echo "Building ${env.SERVICE} docker image"
 
@@ -41,8 +45,7 @@ pipeline {
     {
       steps {     
         withEcr {
-            //sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:${getVersion('-d')}"
-            sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:1.0.0"
+            sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:${getVersion('-d')}"
         }
         
         //Copy tar.gz file to s3 bucket
