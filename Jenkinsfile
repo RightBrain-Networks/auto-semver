@@ -8,9 +8,10 @@ pipeline {
     GITHUB_KEY = 'autosemverDeployKey'
     GITHUB_URL = 'https://github.com/RightBrain-Networks/auto-semver'
     DOCKER_REGISTRY = '356438515751.dkr.ecr.us-east-1.amazonaws.com'
+    VERSION = ""
   }
   stages {
-    stage("Docker ECR")
+    stage("Pull Versioning Image")
     {
         steps
         {
@@ -26,6 +27,7 @@ pipeline {
       steps {
         // runs the automatic semver tool which will version, & tag,
         runAutoSemver()
+        env.VERSION = "${getVersion('-d')}"
       }
     }
     stage('Build') {
@@ -34,7 +36,7 @@ pipeline {
         echo "Building ${env.SERVICE} docker image"
 
         // Docker build flags are set via the getDockerBuildFlags() shared library.
-        sh "docker build ${getDockerBuildFlags()} -t ${env.DOCKER_REGISTRY}/${env.SERVICE}:${getVersion('-d')} ."
+        sh "docker build ${getDockerBuildFlags()} -t ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION} ."
 
         //sh "tar -czvf ${env.SERVICE}-${getVersion('-d')}.tar.gz deployer"
       }
