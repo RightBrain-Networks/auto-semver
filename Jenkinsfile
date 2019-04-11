@@ -14,7 +14,7 @@ pipeline {
     {
         steps
         {
-            sh "docker pull 356438515751.dkr.ecr.us-east-1.amazonaws.com/auto-semver"
+            sh "docker pull 356438515751.dkr.ecr.us-east-1.amazonaws.com/auto-semver:HEAD"
         }
     }
     stage('Version') {
