@@ -9,27 +9,45 @@ pipeline {
     GITHUB_URL = 'https://github.com/RightBrain-Networks/auto-semver'
     DOCKER_REGISTRY = '356438515751.dkr.ecr.us-east-1.amazonaws.com'
     VERSION = ""
+
+
+    //Image tag to use for self-versioning
+    SELF_SEMVER_TAG = "HEAD"
+    
   }
   stages {
+    //Pulls docker image for self-versioning
     stage("Pull Versioning Image")
     {
         steps
         {
-            sh "docker pull 356438515751.dkr.ecr.us-east-1.amazonaws.com/auto-semver:HEAD"
+            sh "docker pull ${DOCKER_REGISTRY}/auto-semver:${SELF_SEMVER_TAG}"
         }
     }
+    //Runs versioning in docker container
     stage('Version') {
         agent {
             docker {
-                image '356438515751.dkr.ecr.us-east-1.amazonaws.com/auto-semver:HEAD'
+                image "${DOCKER_REGISTRY}/auto-semver:${SELF_SEMVER_TAG}"
             }
         }
       steps {
         // runs the automatic semver tool which will version, & tag,
         runAutoSemver()
+
+        //Grabs current version
         script
         {
             env.VERSION = getVersion('-d')
+        }
+      }
+      post{
+        // Update Git with status of version stage.
+        success {
+          updateGithubCommitStatus(GITHUB_URL, 'Passed version stage', 'SUCCESS', 'Version')
+        }
+        failure {
+          updateGithubCommitStatus(GITHUB_URL, 'Failed version stage', 'FAILURE', 'Version')
         }
       }
     }
@@ -57,11 +75,8 @@ pipeline {
     {
       steps {     
         withEcr {
-            sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:${getVersion('-d')}"
+            sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION}"
         }
-        
-        //Copy tar.gz file to s3 bucket
-        //sh "aws s3 cp ${env.SERVICE}-${getVersion('-d')}.tar.gz s3://rbn-ops-pkg-us-east-1/${env.SERVICE}/${env.SERVICE}-${getVersion('-d')}.tar.gz"
         
       }
       post
