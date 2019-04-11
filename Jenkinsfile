@@ -20,7 +20,7 @@ pipeline {
     stage('Version') {
         agent {
             docker {
-                image 'auto-semver:HEAD'
+                image '356438515751.dkr.ecr.us-east-1.amazonaws.com/auto-semver:HEAD'
             }
         }
       steps {
