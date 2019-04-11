@@ -59,11 +59,12 @@ pipeline {
         }
       }
     }
-    post {
-        always {
-            removeDockerImages()
-            cleanWs()
-        }
-    }
   }
+  post {
+      always {
+          removeDockerImages()
+          cleanWs()
+      }
+  }
+  
 }
