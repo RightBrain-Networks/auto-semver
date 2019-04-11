@@ -29,7 +29,7 @@ pipeline {
         runAutoSemver()
         script
         {
-            env.VERSION = $(getVersion('-d'))
+            env.VERSION = getVersion('-d')
         }
       }
     }
