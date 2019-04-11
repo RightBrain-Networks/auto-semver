@@ -27,7 +27,7 @@ pipeline {
       steps {
         // runs the automatic semver tool which will version, & tag,
         runAutoSemver()
-        env.VERSION = "${getVersion('-d')}"
+        VERSION = "${getVersion('-d')}"
       }
     }
     stage('Build') {
