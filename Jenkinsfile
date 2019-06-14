@@ -21,7 +21,9 @@ pipeline {
     {
         steps
         {
+          withEcr {
             sh "docker pull ${DOCKER_REGISTRY}/auto-semver:${SELF_SEMVER_TAG}"
+          }
         }
     }
     //Runs versioning in docker container
