@@ -1,4 +1,4 @@
-library('pipeline-library@feature/add-with-ecr')
+library('pipeline-library')
 
 pipeline {
   options { timestamps() }
