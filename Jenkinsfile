@@ -1,4 +1,4 @@
-library('pipeline-library@feature/add-with-ecr')
+library('pipeline-library')
 
 pipeline {
   options { timestamps() }
@@ -21,7 +21,9 @@ pipeline {
     {
         steps
         {
+          withEcr {
             sh "docker pull ${DOCKER_REGISTRY}/auto-semver:${SELF_SEMVER_TAG}"
+          }
         }
     }
     //Runs versioning in docker container
@@ -89,6 +91,12 @@ pipeline {
             updateGithubCommitStatus(GITHUB_URL, 'Failed push stage', 'FAILURE', 'Push')
         }
       }
+    }
+    stage('Push Version and Tag') {
+        steps {
+            echo "The current branch is ${env.BRANCH_NAME}."
+            gitPush(env.GITHUB_KEY, env.BRANCH_NAME, true)
+        }
     }
   }
   post {
