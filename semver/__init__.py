@@ -61,16 +61,24 @@ class SemVer(object):
     # based on branches involved see what type of versioning should be done
     def get_version_type(self):
         print('Merged branch is ' + self.merged_branch)
+
+ 
+        #Get GitHub repo's owner from url
+        repoOwner = None
+        remoteUrl = subprocess.Popen(['git', 'config', '--get', 'remote.origin.url'], stdout=subprocess.PIPE).stdout.read().decode('utf-8').rstrip()
+        if "github.com" in remoteUrl:
+            repoOwner = re.search("(?<=github.com(:|\/))(.*)(?=\/.*.git)", remoteUrl).group(0)
+
         for prefix in self.major_branches:
-            if self.merged_branch.startswith(prefix + '/'):
+            if self.merged_branch.startswith(prefix + '/') or self.merged_branch.startswith(str(repoOwner) + '/' + prefix + '/'):
                 self.version_type = 'major'
                 return True
         for prefix in self.minor_branches:
-            if self.merged_branch.startswith(prefix + '/'):
+            if self.merged_branch.startswith(prefix + '/') or self.merged_branch.startswith(str(repoOwner) + '/' + prefix + '/'):
                 self.version_type = 'minor'
                 return True
         for prefix in self.patch_branches:
-            if self.merged_branch.startswith(prefix + '/'):
+            if self.merged_branch.startswith(prefix + '/') or self.merged_branch.startswith(str(repoOwner) + '/' + prefix + '/'):
                 self.version_type = 'patch'
                 return True
         return False
