@@ -81,6 +81,7 @@ pipeline {
             {
               if("${env.BRANCH_NAME}" != "develop")
               {
+                sh "docker tag ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION} ${env.DOCKER_REGISTRY}/${env.SERVICE}:latest"
                 sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:latest"
               }
             }
