@@ -79,7 +79,7 @@ pipeline {
             sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION}"
             script
             {
-              if("${env.BRANCH_NAME}" == "develop")
+              if("${env.BRANCH_NAME}" != "develop")
               {
                 sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:latest"
               }
