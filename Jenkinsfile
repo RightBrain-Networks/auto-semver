@@ -53,6 +53,13 @@ pipeline {
         }
       }
     }
+    stage('Test')
+    {
+      steps
+      {
+        sh('git log -1')
+      }
+    }
     stage('Build') {
       steps {
 
