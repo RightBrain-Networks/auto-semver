@@ -8,7 +8,6 @@ pipeline {
     GITHUB_KEY = 'autosemverDeployKey'
     GITHUB_URL = 'https://github.com/RightBrain-Networks/auto-semver'
     DOCKER_REGISTRY = '356438515751.dkr.ecr.us-east-1.amazonaws.com'
-    VERSION = ""
 
 
     //Image tag to use for self-versioning
@@ -78,6 +77,13 @@ pipeline {
       steps {     
         withEcr {
             sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION}"
+            script
+            {
+              if("${env.BRANCH_NAME}" == "develop")
+              {
+                sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:latest"
+              }
+            }
         }
         
       }
