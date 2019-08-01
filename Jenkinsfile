@@ -6,13 +6,12 @@ pipeline {
   environment {
     SERVICE = 'auto-semver'
     GITHUB_KEY = 'autosemverDeployKey'
-    GITHUB_URL = 'https://github.com/RightBrain-Networks/auto-semver'
+    GITHUB_URL = 'git@github.com:RightBrain-Networks/auto-semver.git'
     DOCKER_REGISTRY = '356438515751.dkr.ecr.us-east-1.amazonaws.com'
-    VERSION = ""
 
 
     //Image tag to use for self-versioning
-    SELF_SEMVER_TAG = "HEAD"
+    SELF_SEMVER_TAG = "bugfix.pipeline"
     
   }
   stages {
@@ -61,7 +60,7 @@ pipeline {
         // Docker build flags are set via the getDockerBuildFlags() shared library.
         sh "docker build ${getDockerBuildFlags()} -t ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION} ."
 
-        //sh "tar -czvf ${env.SERVICE}-${getVersion('-d')}.tar.gz deployer"
+        sh "tar -czvf ${env.SERVICE}-${env.VERSION}.tar.gz . --exclude='./.git'"
       }
       post{
         // Update Git with status of build stage.
@@ -78,7 +77,16 @@ pipeline {
       steps {     
         withEcr {
             sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION}"
+            script
+            {
+              if("${env.BRANCH_NAME}" == "develop")
+              {
+                sh "docker tag ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION} ${env.DOCKER_REGISTRY}/${env.SERVICE}:latest"
+                sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:latest"
+              }
+            }
         }
+        sh "aws s3 cp dist/${env.SERVICE}-*.tar.gz s3://rbn-ops-pkg-us-east-1/${env.SERVICE}/${env.SERVICE}-${env.VERSION}.tar.gz"
         
       }
       post
