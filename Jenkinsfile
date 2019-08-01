@@ -60,7 +60,7 @@ pipeline {
         // Docker build flags are set via the getDockerBuildFlags() shared library.
         sh "docker build ${getDockerBuildFlags()} -t ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION} ."
 
-        sh "tar -czvf ${env.SERVICE}-${env.VERSION}.tar.gz . --exclude='./.git'"
+        sh "tar -czvf ${env.SERVICE}-${env.VERSION}.tar.gz . --exclude='./.git' --exclude='./.gitignore' --exclude='./.bumpversion.cfg'"
       }
       post{
         // Update Git with status of build stage.
@@ -74,7 +74,7 @@ pipeline {
     }
     stage('Push')
     {
-      steps {     
+      steps {
         withEcr {
             sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION}"
             script
