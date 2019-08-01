@@ -60,7 +60,7 @@ pipeline {
         // Docker build flags are set via the getDockerBuildFlags() shared library.
         sh "docker build ${getDockerBuildFlags()} -t ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION} ."
 
-        sh "tar -czvf ${env.SERVICE}-${env.VERSION}.tar.gz . VERSION semver setup.py dist"
+        sh "tar -czvf ${env.SERVICE}-${env.VERSION}.tar.gz VERSION semver setup.py dist"
       }
       post{
         // Update Git with status of build stage.
