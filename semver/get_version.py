@@ -15,7 +15,15 @@ except ImportError:
 def get_version(dot=False):
     config = ConfigParser()
     config.read('./.bumpversion.cfg')
-    version = config.get('bumpversion', 'current_version')
+
+    version = "develop"
+    
+    tagged_versions = subprocess.Popen(['git','tag','-l','[0-9]*.[0-9]*.[0-9]*'],
+        stdout=subprocess.PIPE, stderr=DEVNULL, cwd=".").stdout.read().decode('utf-8').rstrip().split('\n')
+    if len(tagged_versions) > 0 and tagged_versions[-1] != "":
+        version = tagged_versions[-1]
+    
+
     # Get the commit hash of the version 
     v_hash = subprocess.Popen(['git', 'rev-list', '-n', '1', version], stdout=subprocess.PIPE,
                              stderr=DEVNULL, cwd='.').stdout.read().decode('utf-8').rstrip()
