@@ -12,7 +12,7 @@ except ImportError:
     DEVNULL = open(os.devnull, 'wb')
 
 def get_tag_version():
-    version = "develop"
+    version = "0.0.0"
     
     tagged_versions = subprocess.Popen(['git','tag','-l','[0-9]*.[0-9]*.[0-9]*'],
         stdout=subprocess.PIPE, stderr=DEVNULL, cwd=".").stdout.read().decode('utf-8').rstrip().split('\n')

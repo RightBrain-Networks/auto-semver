@@ -107,8 +107,10 @@ class SemVer(object):
         current_config = re.search(pattern, config_file)
         if current_config:
             config_file.replace(current_config, "current_version = " + get_tag_version())
-            with open(".bumpversion.cfg", "w") as file:
-                file.write(config_file)
+        else:
+            config_file.replace("[bumpversion]","[bumpversion]\ncurrent_version = " + get_tag_version())
+        with open(".bumpversion.cfg", "w") as file:
+            file.write(config_file)
 
         # version repo
         p = subprocess.Popen(['bumpversion', self.version_type],
