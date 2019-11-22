@@ -48,7 +48,7 @@ pipeline {
             env.SEMVER_RESOLVED_VERSION = getVersion('-d')
 
             env.VERSION = getVersion('-d')
-            }
+            
           }
         }
       }
