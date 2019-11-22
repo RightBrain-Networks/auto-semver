@@ -18,39 +18,7 @@ pipeline {
     //Runs versioning in docker container
     stage('Self Version') {
       steps {
-        script
-        {
-
-          def docker_image = docker.image("${DOCKER_REGISTRY}/auto-semver:${SELF_SEMVER_TAG}")
-          docker_image.inside{
-
-            def RETURN_STATUS
-            def regex = '^\\s*current_version\\s*=\\s*\\K[^\\s]+'
-            env.SEMVER_OLD_VERSION = sh(script: "grep -Po '${regex}' .bumpversion.cfg", returnStdout: true).trim()
-
-            RETURN_STATUS = sh(script: "semver -n", returnStatus: true)
-            echo "Semver Return Status: ${RETURN_STATUS}"
-            env.SEMVER_STATUS = RETURN_STATUS
-            switch (RETURN_STATUS) {
-              case "0":
-                echo 'Versioned will push after build/test.'
-                break
-              case "128":
-                echo 'Unknown Semver Failure'
-                sh 'exit 1'
-                break
-              default:
-                echo 'No versioning required.'
-                break
-            }
-
-            env.SEMVER_NEW_VERSION = sh(script: "grep -Po '${regex}' .bumpversion.cfg", returnStdout: true).trim()
-            env.SEMVER_RESOLVED_VERSION = getVersion('-d')
-
-            env.VERSION = getVersion('-d')
-            
-          }
-        }
+        runAutoSemver("${DOCKER_REGISTRY}/auto-semver:${SELF_SEMVER_TAG}")
       }
       post{
         // Update Git with status of version stage.
