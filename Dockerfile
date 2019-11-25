@@ -21,6 +21,6 @@ VOLUME /workspace
 RUN useradd -d /semverUser semverUser
 RUN chown -R semverUser:semverUser /workspace
 
-ENTRYPOINT [ "semver" ]
+CMD [ "semver" ]
 
 USER semverUser
