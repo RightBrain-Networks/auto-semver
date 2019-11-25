@@ -1,6 +1,8 @@
 import argparse
 import re
 import subprocess
+from semver.get_version import get_tag_version
+
 try: 
     from configparser import ConfigParser
 except ImportError:
@@ -97,6 +99,19 @@ class SemVer(object):
 
     # use bumpversion to increment the appropriate version type
     def version_repo(self):
+        config_file = ""
+        with open(".bumpversion.cfg", "r") as file:
+            config_file = file.read()
+        # Update .bumpconfig
+        pattern = re.compile("current_version = [0-9.]*")
+        current_config = re.search(pattern, config_file)
+        if current_config:
+            config_file.replace(current_config, "current_version = " + get_tag_version())
+        else:
+            config_file.replace("[bumpversion]","[bumpversion]\ncurrent_version = " + get_tag_version())
+        with open(".bumpversion.cfg", "w") as file:
+            file.write(config_file)
+
         # version repo
         p = subprocess.Popen(['bumpversion', self.version_type],
                              cwd='.')

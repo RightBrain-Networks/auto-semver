@@ -15,32 +15,10 @@ pipeline {
     
   }
   stages {
-    //Pulls docker image for self-versioning
-    stage("Pull Versioning Image")
-    {
-        steps
-        {
-          withEcr {
-            sh "docker pull ${DOCKER_REGISTRY}/auto-semver:${SELF_SEMVER_TAG}"
-          }
-        }
-    }
     //Runs versioning in docker container
-    stage('Version') {
-        agent {
-            docker {
-                image "${DOCKER_REGISTRY}/auto-semver:${SELF_SEMVER_TAG}"
-            }
-        }
+    stage('Self Version') {
       steps {
-        // runs the automatic semver tool which will version, & tag,
-        runAutoSemver()
-
-        //Grabs current version
-        script
-        {
-            env.VERSION = getVersion('-d')
-        }
+        runAutoSemver("${DOCKER_REGISTRY}/auto-semver:${SELF_SEMVER_TAG}")
       }
       post{
         // Update Git with status of version stage.

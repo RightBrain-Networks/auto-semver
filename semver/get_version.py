@@ -11,11 +11,22 @@ except ImportError:
     import os
     DEVNULL = open(os.devnull, 'wb')
 
-
-def get_version(dot=False):
+def get_tag_version():
     config = ConfigParser()
     config.read('./.bumpversion.cfg')
-    version = config.get('bumpversion', 'current_version')
+    tag_expression = config.get('bumpversion','tag_name').replace('{new_version}','[0-9]*.[0-9]*.[0-9]*')
+
+    version = "0.0.0"
+    
+    tagged_versions = subprocess.Popen(['git','tag','-l',tag_expression],
+        stdout=subprocess.PIPE, stderr=DEVNULL, cwd=".").stdout.read().decode('utf-8').rstrip().split('\n')
+    if len(tagged_versions) > 0 and tagged_versions[-1] != "":
+        version = tagged_versions[-1]
+    return version
+
+def get_version(dot=False):
+    version = get_tag_version()
+
     # Get the commit hash of the version 
     v_hash = subprocess.Popen(['git', 'rev-list', '-n', '1', version], stdout=subprocess.PIPE,
                              stderr=DEVNULL, cwd='.').stdout.read().decode('utf-8').rstrip()
