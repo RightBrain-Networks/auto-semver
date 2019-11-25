@@ -5,7 +5,7 @@ pipeline {
   agent any
   environment {
     SERVICE = 'auto-semver'
-    GITHUB_KEY = 'autosemverDeployKey'
+    GITHUB_KEY = 'rbn-ops github'
     GITHUB_URL = 'git@github.com:RightBrain-Networks/auto-semver.git'
     DOCKER_REGISTRY = '356438515751.dkr.ecr.us-east-1.amazonaws.com'
 
@@ -81,7 +81,7 @@ pipeline {
     stage('Push Version and Tag') {
         steps {
             echo "The current branch is ${env.BRANCH_NAME}."
-            gitPush(env.GITHUB_KEY, env.BRANCH_NAME, true)
+            gitPushTags(env.GITHUB_KEY)
         }
     }
   }
