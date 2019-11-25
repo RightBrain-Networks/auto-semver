@@ -103,17 +103,17 @@ class SemVer(object):
         with open(".bumpversion.cfg", "r") as file:
             config_file = file.read()
         # Update .bumpconfig
-        pattern = re.compile("current_version = [0-9.]*")
-        current_config = re.search(pattern, config_file)
-        if current_config:
-            config_file.replace(current_config.group(0), "current_version = " + get_tag_version())
-        else:
-            config_file.replace("[bumpversion]","[bumpversion]\ncurrent_version = " + get_tag_version())
-        with open(".bumpversion.cfg", "w") as file:
-            file.write(config_file)
+        #pattern = re.compile("current_version = [0-9.]*")
+        #current_config = re.search(pattern, config_file)
+        #if current_config:
+            #config_file.replace(current_config.group(0), "current_version = " + get_tag_version())
+        #else:
+            #config_file.replace("[bumpversion]","[bumpversion]\ncurrent_version = " + get_tag_version())
+        #with open(".bumpversion.cfg", "w") as file:
+            #file.write(config_file)
 
         # version repo
-        p = subprocess.Popen(['bumpversion', self.version_type],
+        p = subprocess.Popen(['bumpversion', '--current-version', get_tag_version(), self.version_type],
                              cwd='.')
         p.wait()
         return self
