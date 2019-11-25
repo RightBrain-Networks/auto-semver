@@ -106,7 +106,7 @@ class SemVer(object):
         pattern = re.compile("current_version = [0-9.]*")
         current_config = re.search(pattern, config_file)
         if current_config:
-            config_file.replace(current_config, "current_version = " + get_tag_version())
+            config_file.replace(current_config.group(0), "current_version = " + get_tag_version())
         else:
             config_file.replace("[bumpversion]","[bumpversion]\ncurrent_version = " + get_tag_version())
         with open(".bumpversion.cfg", "w") as file:
