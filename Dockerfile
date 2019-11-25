@@ -1,20 +1,26 @@
-FROM centos:7
+FROM centos/python-36-centos7
+ 
+USER root
 
-MAINTAINER RightBrain Networks "ops+docker@rightbrainnetworks.com"
-
-RUN yum update -y && yum install -y epel-release
-
-RUN yum install -y git
-
-RUN yum install -y python-pip
+#Perform updates
 RUN pip install --upgrade pip
+RUN yum update -y
 
-RUN useradd -d /semver semver
+#Setup semver
+ADD / /semver
 WORKDIR /semver
+RUN python setup.py sdist
+RUN pip install dist/semver-*.tar.gz
 
-ADD ./ /semver
-RUN chmod -R +r /semver && chmod +x /semver
+# Prep workspace
+RUN mkdir /workspace
+WORKDIR /workspace
+VOLUME /workspace
 
-RUN pip install -e .
+#Permissions
+RUN useradd -d /semverUser semverUser
+RUN chown -R semverUser:semverUser /workspace
 
-CMD semver && semver_get_version
+ENTRYPOINT [ "semver" ]
+
+USER semverUser
