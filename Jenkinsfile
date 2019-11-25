@@ -11,7 +11,7 @@ pipeline {
 
 
     //Image tag to use for self-versioning
-    SELF_SEMVER_TAG = "bugfix.pipeline"
+    SELF_SEMVER_TAG = "develop"
     
   }
   stages {
