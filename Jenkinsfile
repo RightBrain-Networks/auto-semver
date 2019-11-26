@@ -64,7 +64,7 @@ pipeline {
               }
             }
         }
-        sh "aws s3 cp `find ./dist/ -name semver-*` s3://rbn-ops-pkg-us-east-1/${env.SERVICE}/${env.SERVICE}-${env.VERSION}.tar.gz"
+        sh "aws s3 cp `ls -t ./dist/semver-* | head -1` s3://rbn-ops-pkg-us-east-1/${env.SERVICE}/${env.SERVICE}-${env.VERSION}.tar.gz"
         
       }
       post
