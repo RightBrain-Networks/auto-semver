@@ -85,10 +85,9 @@ pipeline {
         }
     }
   }
-  post {
-      always {
-        cleanWS()
-      }
+ post { 
+   success { updateGithubCommitStatus(GITHUB_URL, 'Passed build and test', 'SUCCESS') }
+   failure { updateGithubCommitStatus(GITHUB_URL, 'Failed build and test', 'FAILURE') }
   }
   
 }
