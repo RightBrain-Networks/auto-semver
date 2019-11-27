@@ -18,7 +18,7 @@ def get_tag_version():
 
     version = "0.0.0"
     
-    tagged_versions = subprocess.Popen(['git','tag','-l',tag_expression],
+    tagged_versions = subprocess.Popen(['git','tag','--sort=taggerdate', '-l',tag_expression],
         stdout=subprocess.PIPE, stderr=DEVNULL, cwd=".").stdout.read().decode('utf-8').rstrip().split('\n')
     if len(tagged_versions) > 0 and tagged_versions[-1] != "":
         version = tagged_versions[-1]
