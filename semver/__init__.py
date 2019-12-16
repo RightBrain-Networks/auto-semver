@@ -66,7 +66,7 @@ class SemVer(object):
 
         merged_prefix = None
         matches = re.findall("[\/][^\/]+[\/]", self.merged_branch)
-        if len(matches > 1):
+        if len(matches) > 1:
             merged_prefix = matches[1][1:-1]
 
         if merged_prefix:
