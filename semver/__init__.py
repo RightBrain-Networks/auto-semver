@@ -65,9 +65,9 @@ class SemVer(object):
         print('Merged branch is ' + self.merged_branch)
 
         merged_prefix = None
-        matches = re.findall("[\/][^\/]+[\/]", self.merged_branch)
-        if len(matches) > 1:
-            merged_prefix = matches[0][1:-1]
+        matches = re.findall("[^\/]*/", self.merged_branch)
+        if len(matches) >= 1:
+            merged_prefix = matches[-1][0:-1]
 
         if merged_prefix:
             for prefix in self.major_branches:
