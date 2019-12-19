@@ -6,9 +6,7 @@ The automated semantic version solution (auto-semver) does three things:
 2. A new Git commit _can_ be made to the chosen repository
 3. A new Git tag with the version is created and linked to the versioned commit.
 
-```txt
-It is important to note that the tool performs actions on a local Git repository. After completion, it will be necessary to do a 'git push --tags' if a commit and tag are created
-```
+***It is important to note that the tool performs actions on a local Git repository. After completion, it will be necessary to do a `git push --tags` if a commit and tag are created***
 
 ## Setup
 
@@ -131,3 +129,7 @@ The `semver_get_version` command returns the version number if the `semver` comm
 `-d`
 
 Replaces `/` with `.` in branch names. For example, `feature/test` becomes `feature.test`
+
+### Commitless Versioning
+
+Because auto-semver keeps track of the version by looking at the latest git tag, instead of commiting versioned values to the repository, files can be updated upon release.
