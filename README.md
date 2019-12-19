@@ -69,7 +69,7 @@ You can use this to update mutiple files are runtime.
 
 ```ini
 [semver]
-main_branches = develop
+main_branches = master
 major_branches = major
 minor_branches = feature
 patch_branches = hotfix, bugfix
