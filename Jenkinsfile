@@ -6,7 +6,7 @@ pipeline {
   environment {
     SERVICE = 'auto-semver'
     GITHUB_URL = 'git@github.com:RightBrain-Networks/auto-semver.git'
-
+    env.DOCKER_REGISTRY = credentials('RbnDockerRegistry')
     //Image tag to use for self-versioning
     SELF_SEMVER_TAG = "develop"
     
@@ -15,9 +15,7 @@ pipeline {
     //Runs versioning in docker container
     stage('Self Version') {
       steps {
-          withCredentials([string(credentialsId: 'RbnDockerRegistry', variable: 'DOCKER_REGISTRY')]) {
-            runAutoSemver("${DOCKER_REGISTRY}/auto-semver:${SELF_SEMVER_TAG}")
-          }
+        runAutoSemver("${env.DOCKER_REGISTRY}/auto-semver:${SELF_SEMVER_TAG}")
       }
       post{
         // Update Git with status of version stage.
@@ -34,10 +32,9 @@ pipeline {
 
         echo "Building ${env.SERVICE} docker image"
 
-        withCredentials([string(credentialsId: 'RbnDockerRegistry', variable: 'DOCKER_REGISTRY')]) {
-          // Docker build flags are set via the getDockerBuildFlags() shared library.
-          sh "docker build ${getDockerBuildFlags()} -t ${DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION} ."
-        }
+        // Docker build flags are set via the getDockerBuildFlags() shared library.
+        sh "docker build ${getDockerBuildFlags()} -t ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION} ."
+
 
         sh "python setup.py sdist"
       }
@@ -55,17 +52,15 @@ pipeline {
     {
       steps {     
         withEcr {
-          withCredentials([string(credentialsId: 'RbnDockerRegistry', variable: 'DOCKER_REGISTRY')]) {
-            sh "docker push ${DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION}"
+            sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION}"
             script
             {
               if("${env.BRANCH_NAME}" == "develop")
               {
-                sh "docker tag ${DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION} ${DOCKER_REGISTRY}/${env.SERVICE}:latest"
-                sh "docker push ${DOCKER_REGISTRY}/${env.SERVICE}:latest"
+                sh "docker tag ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION} ${env.DOCKER_REGISTRY}/${env.SERVICE}:latest"
+                sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:latest"
               }
             }
-          }
         }
         sh "aws s3 cp `ls -t ./dist/semver-* | head -1` s3://rbn-ops-pkg-us-east-1/${env.SERVICE}/${env.SERVICE}-${env.VERSION}.tar.gz"
         
