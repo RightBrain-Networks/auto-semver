@@ -1,10 +1,7 @@
 # Automatic Semantic Versioning
 
-The automated semantic version solution (auto-semver) does three things:
-
-1. It increments the version of the chosen repository based on rules in the chosen configuration and updates the VERSION file with the new version.
-2. A new Git commit _can_ be made to the chosen repository
-3. A new Git tag with the version is created and linked to the versioned commit.
+This code repository extends/wraps the bumpversion library to automatically determine which type of increment (Major, Minor, Patch) to perform based on git branch names.
+The tool uses the git log to determine if the last commit was a merge into a main line branch, and if it was, detect the name of the branch being merged in. If the name of the branch begins with one of the key words provided to the configuration file, a new version is produced.
 
 ***It is important to note that the tool performs actions on a local Git repository. After completion, it will be necessary to do a `git push --tags` if a commit and tag are created***
 
@@ -22,18 +19,18 @@ Below is an example configuration of a `.bumpversion.cfg` file using commits:
 
 ```ini
 [bumpversion]
-current_version = 1.23.0
-commit = True
+current_version = develop
+commit = False
 tag = True
 tag_name = {new_version}
 message = Bump version: {current_version} -> {new_version}
 
 [bumpversion:file:VERSION]
-search = version={current_version}
+search = version=develop
 replace = version={new_version}
 
 [semver]
-main_branches = develop
+main_branches = master
 major_branches = major
 minor_branches = feature
 patch_branches = hotfix, bugfix
@@ -68,7 +65,7 @@ The `search` and `replace` options describe how the tool will update the version
 
 You can use this to update mutiple files are runtime.
 
-### Semantic Versioning
+### Branch Based Versioning
 
 ```ini
 [semver]
