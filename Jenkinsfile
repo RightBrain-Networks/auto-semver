@@ -7,7 +7,6 @@ pipeline {
     SERVICE = 'auto-semver'
     GITHUB_KEY = 'rbn-ops github'
     GITHUB_URL = 'git@github.com:RightBrain-Networks/auto-semver.git'
-    DOCKER_REGISTRY = '356438515751.dkr.ecr.us-east-1.amazonaws.com'
 
 
     //Image tag to use for self-versioning
@@ -18,7 +17,9 @@ pipeline {
     //Runs versioning in docker container
     stage('Self Version') {
       steps {
-        runAutoSemver("${DOCKER_REGISTRY}/auto-semver:${SELF_SEMVER_TAG}")
+          withCredentials( [secret( credentialsId: 'RbnDockerRegistry', secretVariable: 'DOCKER_REGISTRY')]) {
+            runAutoSemver("${DOCKER_REGISTRY}/auto-semver:${SELF_SEMVER_TAG}")
+          }
       }
       post{
         // Update Git with status of version stage.
@@ -35,8 +36,10 @@ pipeline {
 
         echo "Building ${env.SERVICE} docker image"
 
-        // Docker build flags are set via the getDockerBuildFlags() shared library.
-        sh "docker build ${getDockerBuildFlags()} -t ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION} ."
+        withCredentials( [secret( credentialsId: 'RbnDockerRegistry', secretVariable: 'DOCKER_REGISTRY')]) {
+          // Docker build flags are set via the getDockerBuildFlags() shared library.
+          sh "docker build ${getDockerBuildFlags()} -t ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION} ."
+        }
 
         sh "python setup.py sdist"
       }
@@ -54,6 +57,7 @@ pipeline {
     {
       steps {     
         withEcr {
+          withCredentials( [secret( credentialsId: 'RbnDockerRegistry', secretVariable: 'DOCKER_REGISTRY')]) {
             sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION}"
             script
             {
@@ -63,6 +67,7 @@ pipeline {
                 sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:latest"
               }
             }
+          }
         }
         sh "aws s3 cp `ls -t ./dist/semver-* | head -1` s3://rbn-ops-pkg-us-east-1/${env.SERVICE}/${env.SERVICE}-${env.VERSION}.tar.gz"
         
