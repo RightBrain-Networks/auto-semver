@@ -5,9 +5,7 @@ pipeline {
   agent any
   environment {
     SERVICE = 'auto-semver'
-    GITHUB_KEY = 'rbn-ops github'
     GITHUB_URL = 'git@github.com:RightBrain-Networks/auto-semver.git'
-
 
     //Image tag to use for self-versioning
     SELF_SEMVER_TAG = "develop"
@@ -86,7 +84,7 @@ pipeline {
     stage('Push Version and Tag') {
         steps {
             echo "The current branch is ${env.BRANCH_NAME}."
-            gitPushTags(env.GITHUB_KEY)
+            gitPushTags('rbn-ops github')
         }
     }
   }
