@@ -6,7 +6,7 @@ pipeline {
   environment {
     SERVICE = 'auto-semver'
     GITHUB_URL = 'git@github.com:RightBrain-Networks/auto-semver.git'
-    env.DOCKER_REGISTRY = credentials('RbnDockerRegistry')
+    DOCKER_REGISTRY = credentials('RbnDockerRegistry')
     //Image tag to use for self-versioning
     SELF_SEMVER_TAG = "develop"
     
