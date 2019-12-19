@@ -3,7 +3,7 @@
 This code repository extends/wraps the bumpversion library to automatically determine which type of increment (Major, Minor, Patch) to perform based on git branch names.
 The tool uses the git log to determine if the last commit was a merge into a main line branch, and if it was, detect the name of the branch being merged in. If the name of the branch begins with one of the key words provided to the configuration file, a new version is produced.
 
-***It is important to note that the tool performs actions on a local Git repository. After completion, it will be necessary to do a `git push --tags` if a commit and tag are created***
+***It is important to note that the tool performs actions on a local Git repository. After completion, it will be necessary to do a `git push --tags` if a commit and/or tag are created***
 
 ## Setup
 
@@ -41,7 +41,7 @@ patch_branches = hotfix, bugfix
 ```ini
 [bumpversion]
 current_version = 1.5.2
-commit = True
+commit = False
 tag = True
 tag_name = v{new_version}
 message = Bump version: {current_version} -> {new_version}
