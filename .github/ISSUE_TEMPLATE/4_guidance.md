@@ -1,6 +1,6 @@
 ---
 name: 🧭 Guidance
-about: Ideas to improve auto-semver
+about: Having issues setting up or using auto-semver
 labels: 'help wanted'
 ---
 
