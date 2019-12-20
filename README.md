@@ -21,14 +21,14 @@ Below is an example configuration of a `.bumpversion.cfg` file using commits:
 
 ```ini
 [bumpversion]
-current_version = develop
+current_version = 0.0.0
 commit = False
 tag = True
 tag_name = {new_version}
 message = Bump version: {current_version} -> {new_version}
 
 [bumpversion:file:VERSION]
-search = version=develop
+search = version=0.0.0
 replace = version={new_version}
 
 [semver]
@@ -42,14 +42,14 @@ patch_branches = hotfix, bugfix
 
 ```ini
 [bumpversion]
-current_version = 1.5.2
+current_version = 0.0.0
 commit = False
 tag = True
 tag_name = v{new_version}
 message = Bump version: {current_version} -> {new_version}
 ```
 
-The `current_version` represents the default version of the application contained in the repository. This must match what is in the VERSION file (example shown below). The `commit` and `tag` options determine whether to create a new Git commit and a new Git tag, respectively. The `tag_name` represents what the name of the Git tag will be, and by default is set to `{new_version}`, which will be substitued with the new version during runtime. This can be changed as desired - for example, `v{new_version}` could resolve to `v1.15.5`. The `message` option is what the message used if there is a git commit.
+The `current_version` exists to tell bumpversion what the current version is. To have auto-semver manage this value, set it to `0.0.0` This must match what is in the VERSION file (example shown below). The `commit` and `tag` options determine whether to create a new Git commit and a new Git tag, respectively. The `tag_name` represents what the name of the Git tag will be, and by default is set to `{new_version}`, which will be substitued with the new version during runtime. This can be changed as desired - for example, `v{new_version}` could resolve to `v1.15.5`. The `message` option is what the message used if there is a git commit.
 
 ### File updates
 
@@ -132,3 +132,36 @@ Replaces `/` with `.` in branch names. For example, `feature/test` becomes `feat
 ### Commitless Versioning
 
 Because auto-semver keeps track of the version by looking at the latest git tag, instead of commiting versioned values to the repository, files can be updated upon release.
+
+### Jenkins Shared Library
+
+This repository is also home to a Jenkins shared library to assit in running auto-semver.
+
+```groovy
+library('auto-semver')
+
+pipeline
+{
+    options { timestamps() }
+    agent any
+    environment {
+        GIT_KEY = 'githubKey' // Git credentials
+    }
+    stages{
+        stage('Version') {
+            steps {
+                runAutoSemver()
+            }
+        }
+        stage('Push Version and Tag') {
+            steps {
+                gitPushTags(env.GIT_KEY)
+            }
+        }
+    }
+}
+```
+
+#### runAutoSemver( String _dockerImage_ )
+
+**dockerImage:** The Docker image and tag to run auto-semver with. By default, it pulls `rbnops/auto-semver:latest`.
