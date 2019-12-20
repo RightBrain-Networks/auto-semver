@@ -78,6 +78,20 @@ pipeline {
         }
       }
     }
+    stage('Publish Release')
+    {
+      when {
+          expression {
+              "${env.SEMVER_STATUS}" == "0" && "${env.BRANCH_NAME}"  == "master"
+          }
+      }
+      steps
+      {
+        createGitHubRelease('rbn-opsGitHubToken', 'RightBrain-Networks/auto-semver', "${env.SEMVER_RESOLVED_VERSION}",
+          "${env.SEMVER_RESOLVED_VERSION}", ["auto-semver.tar.gz" : "dist/${env.SERVICE}-*.tar.gz"])
+      }
+      
+    }
     stage('Push Version and Tag') {
         steps {
             echo "The current branch is ${env.BRANCH_NAME}."
