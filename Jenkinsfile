@@ -7,6 +7,8 @@ pipeline {
     SERVICE = 'auto-semver'
     GITHUB_URL = 'git@github.com:RightBrain-Networks/auto-semver.git'
     DOCKER_REGISTRY = credentials('RbnDockerRegistry')
+    GITHUB_KEY = 'rbn-ops github'
+
     //Image tag to use for self-versioning
     SELF_SEMVER_TAG = "develop"
     
@@ -102,7 +104,7 @@ pipeline {
     stage('Push Version and Tag') {
         steps {
             echo "The current branch is ${env.BRANCH_NAME}."
-            gitPushTags('rbn-ops github')
+            gitPushTags(env.GITHUB_KEY)
         }
     }
   }
