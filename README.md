@@ -49,7 +49,7 @@ tag_name = v{new_version}
 message = Bump version: {current_version} -> {new_version}
 ```
 
-The `current_version` exists to tell bumpversion what the current version is. To have auto-semver manage this value, set it to `0.0.0` This must match what is in the VERSION file (example shown below). The `commit` and `tag` options determine whether to create a new Git commit and a new Git tag, respectively. The `tag_name` represents what the name of the Git tag will be, and by default is set to `{new_version}`, which will be substitued with the new version during runtime. This can be changed as desired - for example, `v{new_version}` could resolve to `v1.15.5`. The `message` option is what the message used if there is a git commit.
+The `current_version` exists to tell bumpversion what the current version is. To have auto-semver manage this value, set it to `0.0.0`. The `commit` and `tag` options determine whether to create a new Git commit and a new Git tag, respectively. The `tag_name` represents what the name of the Git tag will be, and by default is set to `{new_version}`, which will be substitued with the new version during runtime. This can be changed as desired - for example, `v{new_version}` could resolve to `v1.15.5`. The `message` option is what the message used if there is a git commit.
 
 ### File updates
 
