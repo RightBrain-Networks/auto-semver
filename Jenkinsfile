@@ -52,20 +52,18 @@ pipeline {
     }
     stage('Push')
     {
-      steps {     
-        withEcr {
-            sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION}"
-            script
-            {
-              if("${env.BRANCH_NAME}" == "develop")
-              {
-                sh "docker tag ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION} ${env.DOCKER_REGISTRY}/${env.SERVICE}:latest"
-                sh "docker push ${env.DOCKER_REGISTRY}/${env.SERVICE}:latest"
-              }
-            }
-        }
-        sh "aws s3 cp `ls -t ./dist/semver-* | head -1` s3://rbn-ops-pkg-us-east-1/${env.SERVICE}/${env.SERVICE}-${env.VERSION}.tar.gz"
+      steps {
+
+          // Authenticate & push to DockerHub
+          withCredentials([usernamePassword(credentialsId: creds, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+            sh("""
+              docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+              docker push rbnops/auto-semver:${env.VERSION}
+              """)
+          }
         
+          // Copy artifact to S3
+          sh "aws s3 cp `ls -t ./dist/semver-* | head -1` s3://rbn-ops-pkg-us-east-1/${env.SERVICE}/${env.SERVICE}-${env.VERSION}.tar.gz"
       }
       post
       {
@@ -87,8 +85,15 @@ pipeline {
       }
       steps
       {
+        // Create GitHub Release & Upload Artifacts
         createGitHubRelease('rbn-opsGitHubToken', 'RightBrain-Networks/auto-semver', "${env.SEMVER_RESOLVED_VERSION}",
           "${env.SEMVER_RESOLVED_VERSION}", ["auto-semver.tar.gz" : "dist/${env.SERVICE}-*.tar.gz"])
+
+        // Update DockerHub latest tag
+        sh("""
+            docker tag rbnops/auto-semver:${env.VERSION} rbnops/auto-semver:latest
+            docker push rbnops/auto-semver:latest
+          """)
       }
       post
       {
@@ -104,7 +109,7 @@ pipeline {
     stage('Push Version and Tag') {
         steps {
             echo "The current branch is ${env.BRANCH_NAME}."
-            gitPushTags(env.GITHUB_KEY)
+            gitPushTags(env.GITHUB_KEY    )
         }
     }
   }
