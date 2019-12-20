@@ -42,6 +42,8 @@ pipeline {
 
 
         sh "python setup.py sdist"
+ 
+        stash includes: "dist/semver-${env.SEMVER_NEW_VERSION}.tar.gz", name: 'PACKAGE' 
       }
       post{
         // Update Git with status of build stage.
@@ -88,9 +90,10 @@ pipeline {
       }
       steps
       {
+        unstash 'PACKAGE'
         // Create GitHub Release & Upload Artifacts
         createGitHubRelease('rbn-opsGitHubToken', 'RightBrain-Networks/auto-semver', "${env.SEMVER_RESOLVED_VERSION}",
-          "${env.SEMVER_RESOLVED_VERSION}", ["auto-semver.tar.gz" : "dist/${env.SERVICE}-*.tar.gz"])
+          "${env.SEMVER_RESOLVED_VERSION}", ["auto-semver.tar.gz" : "dist/semver-${env.SEMVER_NEW_VERSION}.tar.gz"])
 
         // Update DockerHub latest tag
         sh("""
@@ -108,12 +111,6 @@ pipeline {
             updateGithubCommitStatus(GITHUB_URL, 'Failed release stage', 'FAILURE', 'Release')
         }
       }
-    }
-    stage('Push Version and Tag') {
-        steps {
-            echo "The current branch is ${env.BRANCH_NAME}."
-            gitPushTags(env.GITHUB_KEY)
-        }
     }
   }
  post { 
