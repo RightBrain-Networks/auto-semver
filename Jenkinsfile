@@ -21,7 +21,7 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
           sh("docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}")
         }
-        runAutoSemver("rbnops/auto-semver:${SELF_SEMVER_TAG}")
+        runAutoSemver("rightbrainnetworks/auto-semver:${SELF_SEMVER_TAG}")
       }
       post{
         // Update Git with status of version stage.
