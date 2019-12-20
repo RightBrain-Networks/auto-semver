@@ -49,7 +49,7 @@ tag_name = v{new_version}
 message = Bump version: {current_version} -> {new_version}
 ```
 
-The `current_version` exists to tell bumpversion what the current version is. To have auto-semver manage this value, set it to `0.0.0` This must match what is in the VERSION file (example shown below). The `commit` and `tag` options determine whether to create a new Git commit and a new Git tag, respectively. The `tag_name` represents what the name of the Git tag will be, and by default is set to `{new_version}`, which will be substitued with the new version during runtime. This can be changed as desired - for example, `v{new_version}` could resolve to `v1.15.5`. The `message` option is what the message used if there is a git commit.
+The `current_version` exists to tell bumpversion what the current version is. To have auto-semver manage this value, set it to `0.0.0`. The `commit` and `tag` options determine whether to create a new Git commit and a new Git tag, respectively. The `tag_name` represents what the name of the Git tag will be, and by default is set to `{new_version}`, which will be substitued with the new version during runtime. This can be changed as desired - for example, `v{new_version}` could resolve to `v1.15.5`. The `message` option is what the message used if there is a git commit.
 
 ### File updates
 
@@ -105,7 +105,7 @@ The exit code of auto-semver determines the output.
 |0|Successfully ran auto-semver|
 |1|No merge found|
 |2|Not a main branch|
-|3|No git flow branch name found|
+|3|No version branch name found|
 |128|Unknown error occured|
 
 #### Flags
@@ -128,10 +128,6 @@ The `semver_get_version` command returns the version number if the `semver` comm
 `-d`
 
 Replaces `/` with `.` in branch names. For example, `feature/test` becomes `feature.test`
-
-### Commitless Versioning
-
-Because auto-semver keeps track of the version by looking at the latest git tag, instead of commiting versioned values to the repository, files can be updated upon release.
 
 ### Jenkins Shared Library
 
