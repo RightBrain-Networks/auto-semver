@@ -38,7 +38,7 @@ def call(dockerImage = "rightbrainnetworks/auto-semver:latest") {
       env.SEMVER_NEW_VERSION = sh(script: "grep -Po '${regex}' .bumpversion.cfg", returnStdout: true).trim()
       env.SEMVER_RESOLVED_VERSION = getVersion('-d')
 
-      env.VERSION = getVersion('-d')
+      env.VERSION = env.SEMVER_RESOLVED_VERSION
     }
 
 }
