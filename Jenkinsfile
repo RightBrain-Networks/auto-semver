@@ -5,11 +5,8 @@ pipeline {
   agent any
   environment {
     SERVICE = 'auto-semver'
-    GITHUB_KEY = 'rbn-ops github'
     GITHUB_URL = 'git@github.com:RightBrain-Networks/auto-semver.git'
-    DOCKER_REGISTRY = '356438515751.dkr.ecr.us-east-1.amazonaws.com'
-
-
+    DOCKER_REGISTRY = credentials('RbnDockerRegistry')
     //Image tag to use for self-versioning
     SELF_SEMVER_TAG = "develop"
     
@@ -18,7 +15,7 @@ pipeline {
     //Runs versioning in docker container
     stage('Self Version') {
       steps {
-        runAutoSemver("${DOCKER_REGISTRY}/auto-semver:${SELF_SEMVER_TAG}")
+        runAutoSemver("${env.DOCKER_REGISTRY}/auto-semver:${SELF_SEMVER_TAG}")
       }
       post{
         // Update Git with status of version stage.
@@ -37,6 +34,7 @@ pipeline {
 
         // Docker build flags are set via the getDockerBuildFlags() shared library.
         sh "docker build ${getDockerBuildFlags()} -t ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION} ."
+
 
         sh "python setup.py sdist"
       }
@@ -95,7 +93,7 @@ pipeline {
     stage('Push Version and Tag') {
         steps {
             echo "The current branch is ${env.BRANCH_NAME}."
-            gitPushTags(env.GITHUB_KEY)
+            gitPushTags('rbn-ops github')
         }
     }
   }
