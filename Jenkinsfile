@@ -88,7 +88,16 @@ pipeline {
         createGitHubRelease('rbn-opsGitHubToken', 'RightBrain-Networks/auto-semver', "${env.SEMVER_RESOLVED_VERSION}",
           "${env.SEMVER_RESOLVED_VERSION}", ["auto-semver.tar.gz" : "dist/${env.SERVICE}-*.tar.gz"])
       }
-      
+      post
+      {
+        // Update Git with status of release stage.
+        success {
+            updateGithubCommitStatus(GITHUB_URL, 'Passed release stage', 'SUCCESS', 'Release')
+        }
+        failure {
+            updateGithubCommitStatus(GITHUB_URL, 'Failed release stage', 'FAILURE', 'Release')
+        }
+      }
     }
     stage('Push Version and Tag') {
         steps {
