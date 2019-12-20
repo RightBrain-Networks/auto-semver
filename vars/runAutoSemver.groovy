@@ -10,7 +10,7 @@
  */
 
 // Run Auto Semver
-def call(dockerImage = "auto-semver:latest") {
+def call(dockerImage = "rightbrainnetworks/auto-semver:latest") {
 
     def docker_image = docker.image(dockerImage)
     docker_image.pull()

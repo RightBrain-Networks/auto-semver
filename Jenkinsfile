@@ -39,7 +39,7 @@ pipeline {
         echo "Building ${env.SERVICE} docker image"
 
         // Docker build flags are set via the getDockerBuildFlags() shared library.
-        sh "docker build ${getDockerBuildFlags()} -t rbnops/auto-semver:${env.VERSION} ."
+        sh "docker build ${getDockerBuildFlags()} -t rightbrainnetworks/auto-semver:${env.VERSION} ."
 
 
         sh "python setup.py sdist"
@@ -62,7 +62,7 @@ pipeline {
           withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
             sh("""
               docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
-              docker push rbnops/auto-semver:${env.VERSION}
+              docker push rightbrainnetworks/auto-semver:${env.VERSION}
               """)
           }
         
@@ -95,8 +95,8 @@ pipeline {
 
         // Update DockerHub latest tag
         sh("""
-            docker tag rbnops/auto-semver:${env.VERSION} rbnops/auto-semver:latest
-            docker push rbnops/auto-semver:latest
+            docker tag rightbrainnetworks/auto-semver:${env.VERSION} rightbrainnetworks/auto-semver:latest
+            docker push rightbrainnetworks/auto-semver:latest
           """)
       }
       post

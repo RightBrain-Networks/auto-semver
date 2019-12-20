@@ -164,4 +164,4 @@ pipeline
 
 #### runAutoSemver( String _dockerImage_ )
 
-**dockerImage:** The Docker image and tag to run auto-semver with. By default, it pulls `rbnops/auto-semver:latest`.
+**dockerImage:** The Docker image and tag to run auto-semver with. By default, it pulls `rightbrainnetworks/auto-semver:latest`.
