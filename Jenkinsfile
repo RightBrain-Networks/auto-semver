@@ -11,14 +11,15 @@ pipeline {
     DOCKER_CREDENTIALS = 'rbnopsDockerHubToken'
 
     //Image tag to use for self-versioning
-    SELF_SEMVER_TAG = "develop"
+    SELF_SEMVER_TAG = "master"
     
   }
   stages {
     //Runs versioning in docker container
     stage('Self Version') {
       steps {
-        runAutoSemver("${env.DOCKER_REGISTRY}/auto-semver:${SELF_SEMVER_TAG}")
+        sh("docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}")
+        runAutoSemver("rbnops/auto-semver:${SELF_SEMVER_TAG}")
       }
       post{
         // Update Git with status of version stage.
@@ -110,7 +111,7 @@ pipeline {
     stage('Push Version and Tag') {
         steps {
             echo "The current branch is ${env.BRANCH_NAME}."
-            gitPushTags(env.GITHUB_KEY    )
+            gitPushTags(env.GITHUB_KEY)
         }
     }
   }
