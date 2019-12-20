@@ -36,7 +36,7 @@ pipeline {
         echo "Building ${env.SERVICE} docker image"
 
         // Docker build flags are set via the getDockerBuildFlags() shared library.
-        sh "docker build ${getDockerBuildFlags()} -t ${env.DOCKER_REGISTRY}/${env.SERVICE}:${env.VERSION} ."
+        sh "docker build ${getDockerBuildFlags()} -t rbnops/auto-semver:${env.VERSION} ."
 
 
         sh "python setup.py sdist"
