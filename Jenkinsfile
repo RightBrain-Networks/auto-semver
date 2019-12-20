@@ -13,12 +13,14 @@ pipeline {
     //Image tag to use for self-versioning
     SELF_SEMVER_TAG = "master"
     
-  }
+  } 
   stages {
     //Runs versioning in docker container
     stage('Self Version') {
       steps {
-        sh("docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}")
+        withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+          sh("docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}")
+        }
         runAutoSemver("rbnops/auto-semver:${SELF_SEMVER_TAG}")
       }
       post{
