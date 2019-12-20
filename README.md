@@ -1,3 +1,5 @@
+![Release Version](https://img.shields.io/github/v/release/RightBrain-Networks/auto-semver) ![GitHub Downloads](https://img.shields.io/github/downloads/RightBrain-Networks/auto-semver/total)
+
 # Automatic Semantic Versioning
 
 This code repository extends/wraps the bumpversion library to automatically determine which type of increment (Major, Minor, Patch) to perform based on git branch names.
