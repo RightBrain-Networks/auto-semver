@@ -105,7 +105,7 @@ The exit code of auto-semver determines the output.
 |0|Successfully ran auto-semver|
 |1|No merge found|
 |2|Not a main branch|
-|3|No git flow branch name found|
+|3|No version branch name found|
 |128|Unknown error occured|
 
 #### Flags
@@ -128,10 +128,6 @@ The `semver_get_version` command returns the version number if the `semver` comm
 `-d`
 
 Replaces `/` with `.` in branch names. For example, `feature/test` becomes `feature.test`
-
-### Commitless Versioning
-
-Because auto-semver keeps track of the version by looking at the latest git tag, instead of commiting versioned values to the repository, files can be updated upon release.
 
 ### Jenkins Shared Library
 
