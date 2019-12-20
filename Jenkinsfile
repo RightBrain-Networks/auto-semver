@@ -8,6 +8,7 @@ pipeline {
     GITHUB_URL = 'git@github.com:RightBrain-Networks/auto-semver.git'
     DOCKER_REGISTRY = credentials('RbnDockerRegistry')
     GITHUB_KEY = 'rbn-ops github'
+    DOCKER_CREDENTIALS = 'rbnopsDockerHubToken'
 
     //Image tag to use for self-versioning
     SELF_SEMVER_TAG = "develop"
@@ -55,7 +56,7 @@ pipeline {
       steps {
 
           // Authenticate & push to DockerHub
-          withCredentials([usernamePassword(credentialsId: creds, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+          withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
             sh("""
               docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
               docker push rbnops/auto-semver:${env.VERSION}
