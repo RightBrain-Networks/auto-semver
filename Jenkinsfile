@@ -4,14 +4,13 @@ pipeline {
   options { timestamps() }
   agent any
   environment {
-    SERVICE = 'auto-semver'
+
     GITHUB_URL = 'git@github.com:RightBrain-Networks/auto-semver.git'
-    DOCKER_REGISTRY = credentials('RbnDockerRegistry')
     GITHUB_KEY = 'rbn-ops github'
     DOCKER_CREDENTIALS = 'rbnopsDockerHubToken'
 
-    //Image tag to use for self-versioning
-    SELF_SEMVER_TAG = "master"
+    SERVICE = 'auto-semver'
+    SELF_SEMVER_TAG = "master" //Image tag to use for self-versioning
     
   } 
   stages {
