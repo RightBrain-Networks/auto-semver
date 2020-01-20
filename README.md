@@ -1,4 +1,4 @@
-![Release Version](https://img.shields.io/github/v/release/RightBrain-Networks/auto-semver) ![GitHub Downloads](https://img.shields.io/github/downloads/RightBrain-Networks/auto-semver/total)
+![Release Version](https://img.shields.io/github/v/release/RightBrain-Networks/auto-semver) ![Python Version](https://img.shields.io/pypi/pyversions/semver-by-branch) ![PyPi Downloads](https://img.shields.io/pypi/dm/semver-by-branch)
 
 # Automatic Semantic Versioning
 
@@ -11,7 +11,7 @@ The tool uses the git log to determine if the last commit was a merge into a mai
 
 auto-semver is a pip installable package to install, make sure pip is installed and simply run:
 
-`pip install path/to/auto-semver-<version>tar.gz`
+`pip install semver-by-branch`
 
 ## Configuration
 

@@ -8,6 +8,7 @@ pipeline {
     GITHUB_URL = 'git@github.com:RightBrain-Networks/auto-semver.git'
     GITHUB_KEY = 'rbn-ops github'
     DOCKER_CREDENTIALS = 'rbnopsDockerHubToken'
+    PYPI_CREDENTIALS = 'rbn_pypi_password'
 
     SERVICE = 'auto-semver'
     SELF_SEMVER_TAG = "master" //Image tag to use for self-versioning
@@ -39,11 +40,6 @@ pipeline {
 
         // Docker build flags are set via the getDockerBuildFlags() shared library.
         sh "docker build ${getDockerBuildFlags()} -t rightbrainnetworks/auto-semver:${env.VERSION} ."
-
-
-        sh "python setup.py sdist"
- 
-        stash includes: "dist/semver-${env.SEMVER_NEW_VERSION}.tar.gz", name: 'PACKAGE' 
       }
       post{
         // Update Git with status of build stage.
@@ -66,9 +62,7 @@ pipeline {
               docker push rightbrainnetworks/auto-semver:${env.VERSION}
               """)
           }
-        
-          // Copy artifact to S3
-          sh "aws s3 cp `ls -t ./dist/semver-* | head -1` s3://rbn-ops-pkg-us-east-1/${env.SERVICE}/${env.SERVICE}-${env.VERSION}.tar.gz"
+
       }
       post
       {
@@ -81,7 +75,44 @@ pipeline {
         }
       }
     }
-    stage('Publish Release')
+    stage('Release Packages')
+    {
+      when {
+          expression {
+              "${env.SEMVER_STATUS}" == "0" && "${env.BRANCH_NAME}"  == "master"
+          }
+      }
+      agent {
+          docker {
+              image "rightbrainnetworks/auto-semver:${env.VERSION}"
+          }
+      }
+      steps
+      {
+        // Create GitHub Release & Upload Artifacts
+        createGitHubRelease('rbn-opsGitHubToken', 'RightBrain-Networks/auto-semver', "${env.SEMVER_RESOLVED_VERSION}",
+          "${env.SEMVER_RESOLVED_VERSION}", ["auto-semver.tar.gz" : "dist/semver-${env.SEMVER_NEW_VERSION}.tar.gz"])
+
+
+        // Upload package to PyPi
+        withCredentials([usernamePassword(credentialsId: env.PYPI_CREDENTIALS, usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
+          sh("pip install twine")
+          sh("twine upload dist/* --verbose -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD}")
+        }
+
+      }
+      post
+      {
+        // Update Git with status of release stage.
+        success {
+            updateGithubCommitStatus(GITHUB_URL, 'Passed release package stage', 'SUCCESS', 'Release')
+        }
+        failure {
+            updateGithubCommitStatus(GITHUB_URL, 'Failed release package stage', 'FAILURE', 'Release')
+        }
+      }
+    }
+    stage('Push Docker Image')
     {
       when {
           expression {
@@ -90,11 +121,6 @@ pipeline {
       }
       steps
       {
-        unstash 'PACKAGE'
-        // Create GitHub Release & Upload Artifacts
-        createGitHubRelease('rbn-opsGitHubToken', 'RightBrain-Networks/auto-semver', "${env.SEMVER_RESOLVED_VERSION}",
-          "${env.SEMVER_RESOLVED_VERSION}", ["auto-semver.tar.gz" : "dist/semver-${env.SEMVER_NEW_VERSION}.tar.gz"])
-
         // Update DockerHub latest tag
         sh("""
             docker tag rightbrainnetworks/auto-semver:${env.VERSION} rightbrainnetworks/auto-semver:latest
@@ -105,10 +131,10 @@ pipeline {
       {
         // Update Git with status of release stage.
         success {
-            updateGithubCommitStatus(GITHUB_URL, 'Passed release stage', 'SUCCESS', 'Release')
+            updateGithubCommitStatus(GITHUB_URL, 'Passed push docker stage', 'SUCCESS', 'Docker')
         }
         failure {
-            updateGithubCommitStatus(GITHUB_URL, 'Failed release stage', 'FAILURE', 'Release')
+            updateGithubCommitStatus(GITHUB_URL, 'Failed push docker stage', 'FAILURE', 'Docker')
         }
       }
     }
