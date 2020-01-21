@@ -39,7 +39,10 @@ pipeline {
         echo "Building ${env.SERVICE} docker image"
 
         // Docker build flags are set via the getDockerBuildFlags() shared library.
-        sh "docker build ${getDockerBuildFlags()} -t rightbrainnetworks/auto-semver:${env.VERSION} ."
+        script
+        {
+          dockerImage = docker.build("rightbrainnetworks/auto-semver:${env.VERSION}")
+        }
       }
       post{
         // Update Git with status of build stage.
@@ -57,10 +60,18 @@ pipeline {
 
           // Authenticate & push to DockerHub
           withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-            sh("""
-              docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
-              docker push rightbrainnetworks/auto-semver:${env.VERSION}
-              """)
+            sh("docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}")
+            script
+            {
+              dockerImage.push("${env.VERSION}")
+            }
+          }
+          script
+          {
+            if("${env.SEMVER_STATUS}" == "0" && "${env.BRANCH_NAME}"  == "master")
+            {
+              dockerImage.push('latest')
+            }
           }
 
       }
@@ -109,32 +120,6 @@ pipeline {
         }
         failure {
             updateGithubCommitStatus(GITHUB_URL, 'Failed release package stage', 'FAILURE', 'Release')
-        }
-      }
-    }
-    stage('Push Docker Image')
-    {
-      when {
-          expression {
-              "${env.SEMVER_STATUS}" == "0" && "${env.BRANCH_NAME}"  == "master"
-          }
-      }
-      steps
-      {
-        // Update DockerHub latest tag
-        sh("""
-            docker tag rightbrainnetworks/auto-semver:${env.VERSION} rightbrainnetworks/auto-semver:latest
-            docker push rightbrainnetworks/auto-semver:latest
-          """)
-      }
-      post
-      {
-        // Update Git with status of release stage.
-        success {
-            updateGithubCommitStatus(GITHUB_URL, 'Passed push docker stage', 'SUCCESS', 'Docker')
-        }
-        failure {
-            updateGithubCommitStatus(GITHUB_URL, 'Failed push docker stage', 'FAILURE', 'Docker')
         }
       }
     }
