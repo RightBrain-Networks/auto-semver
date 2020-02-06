@@ -20,7 +20,7 @@ NO_GIT_FLOW = Exception('No git flow branch found')
 
 class SemVer(object):
 
-    GET_COMMIT_MESSAGE = re.compile(r"Merge (branch|pull request) '?(.+)'? (into|from) ([\w/-]+)")
+    GET_COMMIT_MESSAGE = re.compile(r"Merge (branch|pull request) '?(.+)'? (into|from) '?([\w\-]+)'?")
     # Merge pull request #1 from RightBrain-Networks/feature/PLAT-185-versioning
 
     def __init__(self,global_user=False):
