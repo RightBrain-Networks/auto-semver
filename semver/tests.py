@@ -1,5 +1,5 @@
 import unittest, os, subprocess, semver
-
+from semver.logger import logging, logger, console_logger
 
 from semver import get_version
 
@@ -73,6 +73,8 @@ def create_git_environment():
     subprocess.run(['git', 'remote', 'add', 'origin', os.getcwd()+'/.git'])
 
 if __name__ == "__main__":
+    console_logger.setLevel(logging.DEBUG)
+
     subprocess.run(['rm', '-rf', test_directory])
     subprocess.run(['mkdir', test_directory])
     os.chdir(test_directory)
