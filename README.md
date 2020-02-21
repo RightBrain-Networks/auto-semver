@@ -134,7 +134,7 @@ Replaces `/` with `.` in branch names. For example, `feature/test` becomes `feat
 This repository is also home to a Jenkins shared library to assit in running auto-semver.
 
 ```groovy
-library('auto-semver')
+library('auto-semver') // Global shared library for Semver-by-Branch
 
 pipeline
 {
