@@ -2,6 +2,7 @@ import argparse
 import re
 import subprocess
 from semver.get_version import get_tag_version
+from semver.logger import logging, logger, console_logger
 
 try: 
     from configparser import ConfigParser
@@ -50,7 +51,7 @@ class SemVer(object):
                              cwd='.')
         message = str(p.stdout.read())
         branch = b.stdout.read().decode('utf-8').rstrip()
-        print('Main branch is ' + branch)
+        logger.info('Main branch is ' + branch)
         matches = self.GET_COMMIT_MESSAGE.search(message)
         if matches:
             if str(matches.group(4)) == branch:
@@ -62,7 +63,7 @@ class SemVer(object):
 
     # based on branches involved see what type of versioning should be done
     def get_version_type(self):
-        print('Merged branch is ' + self.merged_branch)
+        logger.info('Merged branch is ' + self.merged_branch)
 
         merged_prefix = None
         matches = re.findall("[^\/]*/", self.merged_branch)
@@ -112,6 +113,7 @@ class SemVer(object):
             #file.write(config_file)
 
         # version repo
+        logger.debug("Running bumpversion of type: " + self.version_type)
         p = subprocess.Popen(['bumpversion', '--current-version', get_tag_version(), self.version_type],
                              cwd='.')
         p.wait()
@@ -152,10 +154,16 @@ def main():
         parser = argparse.ArgumentParser(description='Bump Semantic Version.')
         parser.add_argument('-n','--no-push', help='Do not try to push', action='store_false', dest='push')
         parser.add_argument('-g','--global-user', help='Set git user at a global level, helps in jenkins', action='store_true', dest='global_user')
+        parser.add_argument('-D', '--debug', help='Sets logging level to DEBUG', action='store_true', dest='debug', default=False)
         args = parser.parse_args()
+
+
+        if args.debug:
+            console_logger.setLevel(logging.DEBUG)
+
         SemVer(global_user=args.global_user).run(push=args.push)
     except Exception as e:
-        print(e)
+        logger.error(e)
         if e == NO_MERGE_FOUND:
             exit(1)
         elif e == NOT_MAIN_BRANCH:

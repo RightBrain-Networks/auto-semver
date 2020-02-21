@@ -1,4 +1,5 @@
 import argparse
+from semver.logger import logging, logger, console_logger
 import subprocess
 try:
     from configparser import ConfigParser
@@ -16,12 +17,15 @@ def get_tag_version():
     config.read('./.bumpversion.cfg')
     tag_expression = config.get('bumpversion','tag_name').replace('{new_version}','[0-9]*.[0-9]*.[0-9]*')
 
+    logger.debug("Tag expression: " + str(tag_expression))
+
     version = "0.0.0"
     
     tagged_versions = subprocess.Popen(['git','tag','--sort=taggerdate', '-l',tag_expression],
         stdout=subprocess.PIPE, stderr=DEVNULL, cwd=".").stdout.read().decode('utf-8').rstrip().split('\n')
     if len(tagged_versions) > 0 and tagged_versions[-1] != "":
         version = tagged_versions[-1]
+    logger.debug("Tag Version: " + str(version))
     return version
 
 def get_version(dot=False):
@@ -33,9 +37,11 @@ def get_version(dot=False):
     # Get the current commit hash
     c_hash = subprocess.Popen(['git', 'rev-parse', 'HEAD'], stdout=subprocess.PIPE,
                              stderr=DEVNULL, cwd='.').stdout.read().decode('utf-8').rstrip()
+
     # If the version commit hash and current commit hash
     # do not match return the branch name else return the version
     if v_hash != c_hash:
+        logger.debug("v_hash and c_hash do not match!")
         b = subprocess.Popen(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], stdout=subprocess.PIPE,
                             stderr=DEVNULL, cwd='.').stdout.read().decode('utf-8').rstrip()
         if dot:
@@ -47,9 +53,13 @@ def get_version(dot=False):
 def main():
     parser = argparse.ArgumentParser(description='Get Version or Branch.')
     parser.add_argument('-d','--dot', help='Switch out / for . to be used in docker tag', action='store_true', dest='dot')
+    parser.add_argument('-D', '--debug', help='Sets logging level to DEBUG', action='store_true', dest='debug', default=False)
     args = parser.parse_args()
 
-    print(get_version(args.dot))
+    if args.debug:
+        console_logger.setLevel(logging.DEBUG)
+
+    logger.info(get_version(args.dot))
 
 if __name__ == '__main__':
     try: main()
