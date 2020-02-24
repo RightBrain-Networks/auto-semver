@@ -118,6 +118,10 @@ Does not push after versioning.
 
 Shows helps screen.
 
+`-D`/`--debug`
+
+Runs with debug logging.
+
 <a name="semver_get_version"></a>
 ### semver_get_version
 
@@ -128,6 +132,10 @@ The `semver_get_version` command returns the version number if the `semver` comm
 `-d`
 
 Replaces `/` with `.` in branch names. For example, `feature/test` becomes `feature.test`
+
+`-D`/`--debug`
+
+Runs with debug logging.
 
 ### Jenkins Shared Library
 
