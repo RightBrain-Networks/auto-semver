@@ -61,6 +61,12 @@ class TestGetVersion(unittest.TestCase):
         subprocess.call(['git', 'checkout', '-b', 'test/branch'])
         branch = get_version.get_version(False)
         self.assertEqual(branch, "test/branch")
+    def test_get_version_run(self):
+        create_git_environment()
+        val = subprocess.Popen(['python', '../get_version.py', '-d'], stdout=subprocess.PIPE,
+                            stderr=open(os.devnull, 'wb'), cwd='.').stdout.read().decode('utf-8').rstrip()
+        self.assertEqual(val, "master")
+        
 
 class TestGetTagVersion(unittest.TestCase):
     def test_get_version_tag(self):
