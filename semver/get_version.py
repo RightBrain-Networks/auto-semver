@@ -23,7 +23,7 @@ def get_tag_version():
     version = get_file_version(config)
     
     # If a version is found in tags, use that the lastest tagged version
-    tagged_versions = subprocess.Popen(['git','tag','--sort=taggerdate', '-l',tag_expression],
+    tagged_versions = subprocess.Popen(['git','tag','--sort=v:refname', '-l',tag_expression],
         stdout=subprocess.PIPE, stderr=DEVNULL, cwd=".").stdout.read().decode('utf-8').rstrip().split('\n')
     if len(tagged_versions) > 0 and tagged_versions[-1] != "":
         version = tagged_versions[-1]
