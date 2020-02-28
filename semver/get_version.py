@@ -19,13 +19,23 @@ def get_tag_version():
 
     logger.debug("Tag expression: " + str(tag_expression))
 
-    version = "0.0.0"
+    # Default version is `0.0.0` or what is found in 
+    version = get_file_version(config)
     
+    # If a version is found in tags, use that the lastest tagged version
     tagged_versions = subprocess.Popen(['git','tag','--sort=taggerdate', '-l',tag_expression],
         stdout=subprocess.PIPE, stderr=DEVNULL, cwd=".").stdout.read().decode('utf-8').rstrip().split('\n')
     if len(tagged_versions) > 0 and tagged_versions[-1] != "":
         version = tagged_versions[-1]
+        
     logger.debug("Tag Version: " + str(version))
+    return version
+
+def get_file_version(config):
+    version = config.get('bumpversion','current_version')
+    if not version:
+        config.set('bumpversion', 'current_version', '0.0.0')
+        version = '0.0.0'
     return version
 
 def get_version(dot=False):

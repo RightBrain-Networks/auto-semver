@@ -1,7 +1,7 @@
-import unittest, os, subprocess, semver
+import unittest, os, subprocess, re, semver
 from semver.logger import logging, logger, console_logger
 
-from semver import get_version, NO_MERGE_FOUND
+from semver import get_version, NO_MERGE_FOUND, GET_COMMIT_MESSAGE
 
 config_data = """
 [bumpversion]
@@ -78,6 +78,26 @@ class TestGetTagVersion(unittest.TestCase):
         create_git_environment()
         tag = get_version.get_tag_version()
         self.assertEqual(tag, "0.0.0")
+        
+class TestGetCommitMessageRegex(unittest.TestCase):
+    def test_github_message(self):
+        matches = GET_COMMIT_MESSAGE.search("Merge pull request #1 from user/branch")
+        if matches:
+            self.assertEqual(matches.group(4), None)
+            self.assertEqual(matches.group(5), "branch")
+        else:
+            self.assertTrue(False)
+        pass
+    def test_gitlab_message(self):
+        matches = GET_COMMIT_MESSAGE.search("Merge branch 'branch' into 'master'")
+        if matches:
+            self.assertEqual(matches.group(4), "master")
+            self.assertEqual(matches.group(2), "branch")
+        else:
+            self.assertTrue(False)
+    def test_non_merge_message(self):
+        matches = GET_COMMIT_MESSAGE.search("Example unrelated commit message that should get 0 matches")
+        self.assertEqual(matches, None)
 
 def create_git_environment():
     subprocess.call(['rm', '-rf', './.git'])

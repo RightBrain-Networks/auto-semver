@@ -18,9 +18,11 @@ NO_MERGE_FOUND = Exception('No merge found')
 NOT_MAIN_BRANCH = Exception('Not merging into a main branch')
 NO_GIT_FLOW = Exception('No git flow branch found')
 
+# Important regex
+GET_COMMIT_MESSAGE = re.compile(r"Merge (branch|pull request) '?([^']+)'? (into|from) (?:'(.+)'|[^\/]+\/(.+))")
+
 class SemVer(object):
 
-    GET_COMMIT_MESSAGE = re.compile(r"Merge (branch|pull request) '?(.+)'? (into|from) '?([\w\-]+)'?")
     # Merge pull request #1 from RightBrain-Networks/feature/PLAT-185-versioning
 
     def __init__(self,global_user=False):
@@ -52,12 +54,12 @@ class SemVer(object):
         message = str(p.stdout.read())
         branch = b.stdout.read().decode('utf-8').rstrip()
         logger.info('Main branch is ' + branch)
-        matches = self.GET_COMMIT_MESSAGE.search(message)
+        matches = GET_COMMIT_MESSAGE.search(message)
         if matches:
             if str(matches.group(4)) == branch:
                 self.merged_branch = matches.group(2)
             else:
-                self.merged_branch = matches.group(4)
+                self.merged_branch = matches.group(5)
             self.main_branch = branch
         return bool(matches)
 
