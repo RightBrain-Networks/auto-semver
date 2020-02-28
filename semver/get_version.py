@@ -69,7 +69,7 @@ def main():
     if args.debug:
         console_logger.setLevel(logging.DEBUG)
 
-    logger.info(get_version(args.dot))
+    print(get_version(args.dot))
 
 if __name__ == '__main__':
     try: main()
