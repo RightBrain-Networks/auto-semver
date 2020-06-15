@@ -35,7 +35,6 @@ class SemVer(object):
         self.major_branches = self._setting_to_array('major_branches')
         self.minor_branches = self._setting_to_array('minor_branches')
         self.patch_branches = self._setting_to_array('patch_branches')
-        self.get_branches()
 
     def _setting_to_array(self, setting):
         config = ConfigParser()
