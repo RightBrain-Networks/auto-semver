@@ -6,7 +6,8 @@ USER root
 RUN pip install --upgrade pip
 RUN yum update -y
 RUN yum -y remove git
-RUN yum -y install  https://centos7.iuscommunity.org/ius-release.rpm
+RUN yum -y install  https://repo.ius.io/ius-release-el7.rpm \
+                    https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 RUN yum -y install  git2u-all
 
 #Setup semver
