@@ -63,14 +63,14 @@ class TestGetVersion(unittest.TestCase):
         self.assertEqual(branch, "test/branch")
     def test_branch_npm_pre_release(self):
         create_git_environment()
-        subprocess.call(['git', 'checkout', '-b', 'test/branch'])
+        subprocess.call(['git', 'checkout', '-b', 'patch/branch'])
         branch = get_version.get_version(version_format='npm')
-        self.assertEqual(branch, "0.0.0-test-branch.0")
+        self.assertEqual(branch, "0.0.0-patch-branch.0")
     def test_branch_maven_pre_release(self):
         create_git_environment()
-        subprocess.call(['git', 'checkout', '-b', 'test/branch'])
+        subprocess.call(['git', 'checkout', '-b', 'minor/branch'])
         branch = get_version.get_version(version_format='npm')
-        self.assertEqual(branch, "0.0.0-test-branch-SNAPSHOT")
+        self.assertEqual(branch, "0.0.0-minor-branch-SNAPSHOT")
     def test_get_version_run(self):
         create_git_environment()
         val = subprocess.Popen(['python', '../get_version.py', '-d'], stdout=subprocess.PIPE,

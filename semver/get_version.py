@@ -26,15 +26,16 @@ def get_version(build=0,version_format=None,dot=False):
         logger.debug("merged branch is: {}".format(semver.merged_branch))
         version_type = semver.get_version_type()
         logger.debug("version type is: {}".format(version_type))
-        p = subprocess.Popen(['bumpversion', '--dry-run', '--verbose', '--current-version', get_tag_version(), version_type], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd='.')
-        bump_output = p.stdout.read().decode('utf-8').rstrip()
-        next_version = re.search("new_version=([0-9]*.[0-9]*.[0-9]*)", bump_output).group(1)
+        if version_type:
+            p = subprocess.Popen(['bumpversion', '--dry-run', '--verbose', '--current-version', get_tag_version(), version_type], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd='.')
+            bump_output = p.stdout.read().decode('utf-8').rstrip()
+            next_version = re.search("new_version=([0-9]*.[0-9]*.[0-9]*)", bump_output).group(1)
 
-        if version_format == 'npm':
-            return "{}-{}.{}".format(next_version,branch.replace('/','-'),build)
-        if version_format == 'maven':
-            qualifier = 'SNAPSHOT' if build == 0 else build
-            return "{}-{}-{}".format(next_version,branch.replace('/','-'),qualifier)
+            if version_format == 'npm':
+                return "{}-{}.{}".format(next_version,branch.replace('/','-'),build)
+            if version_format == 'maven':
+                qualifier = 'SNAPSHOT' if build == 0 else build
+                return "{}-{}-{}".format(next_version,branch.replace('/','-'),qualifier)
         if dot:
             branch = branch.replace('/','.')
         return branch
