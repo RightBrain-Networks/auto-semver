@@ -125,7 +125,7 @@ Runs with debug logging.
 <a name="semver_get_version"></a>
 ### semver_get_version
 
-The `semver_get_version` command returns the version number if the `semver` command exited `0`. If `semver` exited anything else, `semver_get_version` will return the branch name.
+The `semver_get_version` command returns the version number if the `semver` command exited `0`. If `semver` exited anything else, `semver_get_version` will return the branch name, or a pre-release version if format is specified
 
 #### Flags
 
@@ -136,6 +136,14 @@ Replaces `/` with `.` in branch names. For example, `feature/test` becomes `feat
 `-D`/`--debug`
 
 Runs with debug logging.
+
+`-f`/`--format` `(npm|maven)`
+
+Formats the output for a pre-release version for a specific repository type. For example, `feature/test` becomes `0.1.0-feature-test-SNAPSHOT` for maven with no build number, or `0.1.0-feature-test.0` for maven with no build number.
+
+`-b`/`--build-number` `number`
+
+Provides a build number for pre-release versions.
 
 ### Jenkins Shared Library
 

@@ -6,8 +6,8 @@ USER root
 RUN pip install --upgrade pip
 RUN yum update -y
 RUN yum -y remove git
-RUN yum -y install  https://centos7.iuscommunity.org/ius-release.rpm
-RUN yum -y install  git2u-all
+RUN yum -y install https://packages.endpoint.com/rhel/7/os/x86_64/endpoint-repo-1.7-1.x86_64.rpm
+RUN yum -y install git
 
 #Setup semver
 ADD / /semver

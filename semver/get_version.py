@@ -1,44 +1,11 @@
 import argparse
-from semver.logger import logging, logger, console_logger
+import re
 import subprocess
-try:
-    from configparser import ConfigParser
-except ImportError:
-    # Python < 3
-    from ConfigParser import ConfigParser
-try:
-    from subprocess import DEVNULL # py3k
-except ImportError:
-    import os
-    DEVNULL = open(os.devnull, 'wb')
+from semver.logger import logging, logger, console_logger
+from semver.utils import get_tag_version, get_file_version, DEVNULL
+from semver import SemVer
 
-def get_tag_version():
-    config = ConfigParser()
-    config.read('./.bumpversion.cfg')
-    tag_expression = config.get('bumpversion','tag_name').replace('{new_version}','[0-9]*.[0-9]*.[0-9]*')
-
-    logger.debug("Tag expression: " + str(tag_expression))
-
-    # Default version is `0.0.0` or what is found in 
-    version = get_file_version(config)
-    
-    # If a version is found in tags, use that the lastest tagged version
-    tagged_versions = subprocess.Popen(['git','tag','--sort=v:refname', '-l',tag_expression],
-        stdout=subprocess.PIPE, stderr=DEVNULL, cwd=".").stdout.read().decode('utf-8').rstrip().split('\n')
-    if len(tagged_versions) > 0 and tagged_versions[-1] != "":
-        version = tagged_versions[-1]
-        
-    logger.debug("Tag Version: " + str(version))
-    return version
-
-def get_file_version(config):
-    version = config.get('bumpversion','current_version')
-    if not version:
-        config.set('bumpversion', 'current_version', '0.0.0')
-        version = '0.0.0'
-    return version
-
-def get_version(dot=False):
+def get_version(build=0,version_format=None,dot=False):
     version = get_tag_version()
 
     # Get the commit hash of the version 
@@ -52,25 +19,44 @@ def get_version(dot=False):
     # do not match return the branch name else return the version
     if v_hash != c_hash:
         logger.debug("v_hash and c_hash do not match!")
-        b = subprocess.Popen(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], stdout=subprocess.PIPE,
+        branch = subprocess.Popen(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], stdout=subprocess.PIPE,
                             stderr=DEVNULL, cwd='.').stdout.read().decode('utf-8').rstrip()
+        semver = SemVer()
+        semver.merged_branch = branch
+        logger.debug("merged branch is: {}".format(semver.merged_branch))
+        version_type = semver.get_version_type()
+        logger.debug("version type is: {}".format(version_type))
+        if version_type:
+            p = subprocess.Popen(['bumpversion', '--dry-run', '--verbose', '--current-version', get_tag_version(), version_type], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd='.')
+            bump_output = p.stdout.read().decode('utf-8').rstrip()
+            next_version = re.search("new_version=([0-9]*.[0-9]*.[0-9]*)", bump_output).group(1)
+
+            if version_format == 'npm':
+                return "{}-{}.{}".format(next_version,branch.replace('/','-'),build)
+            if version_format == 'maven':
+                qualifier = 'SNAPSHOT' if build == 0 else build
+                return "{}-{}-{}".format(next_version,branch.replace('/','-'),qualifier)
         if dot:
-            b = b.replace('/','.')
-        return b
+            branch = branch.replace('/','.')
+        return branch
     return version
 
 
 def main():
     parser = argparse.ArgumentParser(description='Get Version or Branch.')
-    parser.add_argument('-d','--dot', help='Switch out / for . to be used in docker tag', action='store_true', dest='dot')
+    parser.add_argument('-d', '--dot', help='Switch out / for . to be used in docker tag', action='store_true', dest='dot')
     parser.add_argument('-D', '--debug', help='Sets logging level to DEBUG', action='store_true', dest='debug', default=False)
+    parser.add_argument('-f', '--format', help='Format for pre-release version syntax', choices=['npm','maven'], default=None)
+    parser.add_argument('-b', '--build-number', help='Build number, used in pre-releases', default=0)
+   
     args = parser.parse_args()
 
     if args.debug:
         console_logger.setLevel(logging.DEBUG)
 
-    print(get_version(args.dot))
+    print(get_version(args.build_number,args.format,args.dot))
 
 if __name__ == '__main__':
     try: main()
     except: raise
+

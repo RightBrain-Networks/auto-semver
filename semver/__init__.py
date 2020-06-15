@@ -1,7 +1,7 @@
 import argparse
 import re
 import subprocess
-from semver.get_version import get_tag_version
+from semver.utils import get_tag_version
 from semver.logger import logging, logger, console_logger
 
 try: 
@@ -44,7 +44,6 @@ class SemVer(object):
         return list(filter(bool, [v.strip() for v in value.split(',')]))
 
     # based on commit message see what branches are involved in the merge
-    
     def get_branches(self):
         p = subprocess.Popen(['git', 'log', '-1'], stdout=subprocess.PIPE,
                              cwd='.')
@@ -76,15 +75,15 @@ class SemVer(object):
             for prefix in self.major_branches:
                 if prefix == merged_prefix:
                     self.version_type = 'major'
-                    return True
+                    return self.version_type
             for prefix in self.minor_branches:
                 if prefix == merged_prefix:
                     self.version_type = 'minor'
-                    return True
+                    return self.version_type
             for prefix in self.patch_branches:
                 if prefix == merged_prefix:
                     self.version_type = 'patch'
-                    return True
+                    return self.version_type
         return False
 
     # setup git settings so we can commit and tag
@@ -104,15 +103,6 @@ class SemVer(object):
         config_file = ""
         with open(".bumpversion.cfg", "r") as file:
             config_file = file.read()
-        # Update .bumpconfig
-        #pattern = re.compile("current_version = [0-9.]*")
-        #current_config = re.search(pattern, config_file)
-        #if current_config:
-            #config_file.replace(current_config.group(0), "current_version = " + get_tag_version())
-        #else:
-            #config_file.replace("[bumpversion]","[bumpversion]\ncurrent_version = " + get_tag_version())
-        #with open(".bumpversion.cfg", "w") as file:
-            #file.write(config_file)
 
         # version repo
         logger.debug("Running bumpversion of type: " + self.version_type)
