@@ -21,19 +21,18 @@ def get_version(build=0,version_format=None,dot=False):
         logger.debug("v_hash and c_hash do not match!")
         branch = subprocess.Popen(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], stdout=subprocess.PIPE,
                             stderr=DEVNULL, cwd='.').stdout.read().decode('utf-8').rstrip()
-        if version_format:
-            semver = SemVer()
-            semver.merged_branch = branch
-            version_type = semver.get_version_type()
-            p = subprocess.Popen(['bumpversion', '--dry-run', '--verbose', '--current-version', get_tag_version(), version_type], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd='.')
-            bump_output = p.stderr.read().decode()
-            next_version = match = re.search("New version will be '([0-9]*.[0-9]*.[0-9]*)'", bump_output).group(1)
-    
-            if version_format == 'npm':
-                return "{}-{}.{}".format(next_version,branch.replace('/','-'),build)
-            if version_format == 'maven':
-                qualifier = 'SNAPSHOT' if build == 0 else build
-                return "{}-{}-{}".format(next_version,branch.replace('/','-'),qualifier)
+        semver = SemVer()
+        semver.merged_branch = branch
+        version_type = semver.get_version_type()
+        p = subprocess.Popen(['bumpversion', '--dry-run', '--verbose', '--current-version', get_tag_version(), version_type], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd='.')
+        bump_output = p.stderr.read().decode()
+        next_version = match = re.search("New version will be '([0-9]*.[0-9]*.[0-9]*)'", bump_output).group(1)
+
+        if version_format == 'npm':
+            return "{}-{}.{}".format(next_version,branch.replace('/','-'),build)
+        if version_format == 'maven':
+            qualifier = 'SNAPSHOT' if build == 0 else build
+            return "{}-{}-{}".format(next_version,branch.replace('/','-'),qualifier)
         if dot:
             branch = branch.replace('/','.')
         return branch

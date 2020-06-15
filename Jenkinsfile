@@ -57,9 +57,7 @@ pipeline {
     }
     stage('Test') {
       agent {
-          docker {
-              image "rightbrainnetworks/auto-semver:${env.VERSION}"
-          }
+          dockerfile true
       }
       steps
       {
