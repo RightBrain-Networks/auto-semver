@@ -5,7 +5,7 @@ from semver.logger import logging, logger, console_logger
 from semver.utils import get_tag_version, get_file_version, DEVNULL
 from semver import SemVer
 
-def get_version(build=0,npm=False,maven=False,dot=False):
+def get_version(build=0,version_format=None,dot=False):
     version = get_tag_version()
 
     # Get the commit hash of the version 
@@ -29,9 +29,9 @@ def get_version(build=0,npm=False,maven=False,dot=False):
         bump_output = p.stderr.read().decode()
         next_version = match = re.search("New version will be '([0-9]*.[0-9]*.[0-9]*)'", bump_output).group(1)
 
-        if npm:
+        if version_format == 'npm':
             return "{}-{}.{}".format(next_version,branch.replace('/','-'),build)
-        if maven:
+        if version_format == 'maven':
             qualifier = 'SNAPSHOT' if build == 0 else build
             return "{}-{}-{}".format(next_version,branch.replace('/','-'),qualifier)
         if dot:
@@ -44,8 +44,7 @@ def main():
     parser = argparse.ArgumentParser(description='Get Version or Branch.')
     parser.add_argument('-d', '--dot', help='Switch out / for . to be used in docker tag', action='store_true', dest='dot')
     parser.add_argument('-D', '--debug', help='Sets logging level to DEBUG', action='store_true', dest='debug', default=False)
-    parser.add_argument('-n', '--npm', help='NPM sytle pre-release version', action='store_true', dest='npm', default=False)
-    parser.add_argument('-m', '--maven', help='Maven sytle pre-release version', action='store_true', dest='maven', default=False)
+    parser.add_argument('-f', '--format', help='Format for pre-release version syntax', choices=['npm','maven'], default=None)
     parser.add_argument('-b', '--build-number', help='Build number, used in pre-releases', default=0)
    
     args = parser.parse_args()
@@ -53,7 +52,7 @@ def main():
     if args.debug:
         console_logger.setLevel(logging.DEBUG)
 
-    print(get_version(args.build_number,args.npm,args.maven,args.dot))
+    print(get_version(args.build_number,args.format,args.dot))
 
 if __name__ == '__main__':
     try: main()
