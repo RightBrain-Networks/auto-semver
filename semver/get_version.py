@@ -64,6 +64,10 @@ def main():
     parser = argparse.ArgumentParser(description='Get Version or Branch.')
     parser.add_argument('-d','--dot', help='Switch out / for . to be used in docker tag', action='store_true', dest='dot')
     parser.add_argument('-D', '--debug', help='Sets logging level to DEBUG', action='store_true', dest='debug', default=False)
+    parser.add_argument('-n', '--npm', help='NPM sytle pre-release version', action='store_true', dest='npm', default=False)
+    parser.add_argument('-m', '--maven', help='Maven sytle pre-release version', action='store_true', dest='npm', default=False)
+    parser.add_argument('-b', '--build-number', help='Build number, used in pre-releases', default=0)
+   
     args = parser.parse_args()
 
     if args.debug:
