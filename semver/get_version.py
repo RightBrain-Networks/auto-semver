@@ -26,7 +26,7 @@ def get_version(build=0,version_format=None,dot=False):
         version_type = semver.get_version_type()
         p = subprocess.Popen(['bumpversion', '--dry-run', '--verbose', '--current-version', get_tag_version(), version_type], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd='.')
         bump_output = p.stderr.read().decode()
-        next_version = match = re.search("New version will be '([0-9]*.[0-9]*.[0-9]*)'", bump_output).group(1)
+        next_version = re.search("new_version=([0-9]*.[0-9]*.[0-9]*)", bump_output).group(1)
 
         if version_format == 'npm':
             return "{}-{}.{}".format(next_version,branch.replace('/','-'),build)
