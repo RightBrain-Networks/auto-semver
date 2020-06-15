@@ -1,7 +1,7 @@
 import unittest, os, subprocess, re, semver
 from semver.logger import logging, logger, console_logger
 
-from semver import get_version, NO_MERGE_FOUND, GET_COMMIT_MESSAGE
+from semver import get_version, utils, NO_MERGE_FOUND, GET_COMMIT_MESSAGE
 
 config_data = """
 [bumpversion]
@@ -54,13 +54,23 @@ class TestGetVersion(unittest.TestCase):
     def test_branch_dotting(self):
         create_git_environment()
         subprocess.call(['git', 'checkout', '-b', 'test/branch'])
-        branch = get_version.get_version(True)
+        branch = get_version.get_version(dot=True)
         self.assertEqual(branch, "test.branch")
     def test_branch_dotting_false(self):
         create_git_environment()
         subprocess.call(['git', 'checkout', '-b', 'test/branch'])
-        branch = get_version.get_version(False)
+        branch = get_version.get_version(dot=False)
         self.assertEqual(branch, "test/branch")
+    def test_branch_npm_pre_release(self):
+        create_git_environment()
+        subprocess.call(['git', 'checkout', '-b', 'test/branch'])
+        branch = get_version.get_version(version_format='npm')
+        self.assertEqual(branch, "0.0.0-test-branch.0")
+    def test_branch_maven_pre_release(self):
+        create_git_environment()
+        subprocess.call(['git', 'checkout', '-b', 'test/branch'])
+        branch = get_version.get_version(version_format='npm')
+        self.assertEqual(branch, "0.0.0-test-branch-SNAPSHOT")
     def test_get_version_run(self):
         create_git_environment()
         val = subprocess.Popen(['python', '../get_version.py', '-d'], stdout=subprocess.PIPE,
@@ -72,7 +82,7 @@ class TestGetTagVersion(unittest.TestCase):
     def test_get_version_tag(self):
         create_git_environment()
         subprocess.call(['git', 'tag', '1.0.0'])
-        tag = get_version.get_tag_version()
+        tag = utils.get_tag_version()
         self.assertEqual(tag, "1.0.0")
     def test_get_version_multiple(self):
         create_git_environment()
@@ -87,7 +97,7 @@ class TestGetTagVersion(unittest.TestCase):
         subprocess.call(['git', 'tag', '1.1.0'])
         subprocess.call(['git', 'tag', '1.2.0'])
         subprocess.call(['git', 'tag', '1.2.1'])
-        tag = get_version.get_tag_version()
+        tag = utils.get_tag_version()
         self.assertEqual(tag, "1.2.1")
     def test_get_version_out_of_order(self):
         subprocess.call(['git', 'tag', '0.1.0'])
@@ -101,11 +111,11 @@ class TestGetTagVersion(unittest.TestCase):
         subprocess.call(['git', 'tag', '1.1.7'])
         subprocess.call(['git', 'tag', '1.2.0'])
         subprocess.call(['git', 'tag', '0.2.1'])
-        tag = get_version.get_tag_version()
+        tag = utils.get_tag_version()
         self.assertEqual(tag, "8.1.0")
     def test_default_get_version_tag(self):
         create_git_environment()
-        tag = get_version.get_tag_version()
+        tag = utils.get_tag_version()
         self.assertEqual(tag, "0.0.0")
         
 class TestGetCommitMessageRegex(unittest.TestCase):
