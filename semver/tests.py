@@ -66,6 +66,11 @@ class TestGetVersion(unittest.TestCase):
         subprocess.call(['git', 'checkout', '-b', 'patch/branch'])
         branch = get_version.get_version(version_format='npm')
         self.assertEqual(branch, "0.0.1-patch-branch.0")
+    def test_branch_docker_pre_release(self):
+        create_git_environment()
+        subprocess.call(['git', 'checkout', '-b', 'patch/branch'])
+        branch = get_version.get_version(build=2,version_format='docker')
+        self.assertEqual(branch, "0.0.1-patch-branch.2")
     def test_branch_maven_pre_release(self):
         create_git_environment()
         subprocess.call(['git', 'checkout', '-b', 'minor/branch'])
