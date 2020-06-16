@@ -139,6 +139,13 @@ class TestGetCommitMessageRegex(unittest.TestCase):
             self.assertEqual(matches.group(2), "branch")
         else:
             self.assertTrue(False)
+    def test_branch_in_message(self):
+        matches = GET_COMMIT_MESSAGE.search(str(b'commit examplehash\nMerge: example\nAuthor: Test <test@nodomain.rightbrainnetworks.com>\nDate:   Mon Jun 15 18:15:22 2020 -0400\n\n    Merge pull request #45 from user/branch\n    \n    user/branch\n'))
+        if matches:
+            self.assertEqual(matches.group(4), None)
+            self.assertEqual(matches.group(5), "branch")
+        else:
+            self.assertTrue(False)
     def test_non_merge_message(self):
         matches = GET_COMMIT_MESSAGE.search("Example unrelated commit message that should get 0 matches")
         self.assertEqual(matches, None)
