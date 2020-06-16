@@ -125,7 +125,7 @@ class TestGetTagVersion(unittest.TestCase):
         
 class TestGetCommitMessageRegex(unittest.TestCase):
     def test_github_message(self):
-        matches = GET_COMMIT_MESSAGE.search("Merge pull request #1 from user/branch")
+        matches = GET_COMMIT_MESSAGE.search("Merge pull request #1 from user/branch \n")
         if matches:
             self.assertEqual(matches.group(4), None)
             self.assertEqual(matches.group(5), "branch")
@@ -133,7 +133,7 @@ class TestGetCommitMessageRegex(unittest.TestCase):
             self.assertTrue(False)
         pass
     def test_gitlab_message(self):
-        matches = GET_COMMIT_MESSAGE.search("Merge branch 'branch' into 'master'")
+        matches = GET_COMMIT_MESSAGE.search("Merge branch 'branch' into 'master' \n")
         if matches:
             self.assertEqual(matches.group(4), "master")
             self.assertEqual(matches.group(2), "branch")
