@@ -31,7 +31,7 @@ def get_version(build=0,version_format=None,dot=False):
             bump_output = p.stdout.read().decode('utf-8').rstrip()
             next_version = re.search("new_version=([0-9]*.[0-9]*.[0-9]*)", bump_output).group(1)
 
-            if version_format == 'npm':
+            if version_format is 'npm' or 'docker':
                 return "{}-{}.{}".format(next_version,branch.replace('/','-'),build)
             if version_format == 'maven':
                 qualifier = 'SNAPSHOT' if build == 0 else build
@@ -46,7 +46,7 @@ def main():
     parser = argparse.ArgumentParser(description='Get Version or Branch.')
     parser.add_argument('-d', '--dot', help='Switch out / for . to be used in docker tag', action='store_true', dest='dot')
     parser.add_argument('-D', '--debug', help='Sets logging level to DEBUG', action='store_true', dest='debug', default=False)
-    parser.add_argument('-f', '--format', help='Format for pre-release version syntax', choices=['npm','maven'], default=None)
+    parser.add_argument('-f', '--format', help='Format for pre-release version syntax', choices=['npm','maven','docker'], default=None)
     parser.add_argument('-b', '--build-number', help='Build number, used in pre-releases', default=0)
    
     args = parser.parse_args()
