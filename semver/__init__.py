@@ -19,7 +19,7 @@ NOT_MAIN_BRANCH = Exception('Not merging into a main branch')
 NO_GIT_FLOW = Exception('No git flow branch found')
 
 # Important regex
-GET_COMMIT_MESSAGE = re.compile(r"Merge (branch|pull request) '?([^']+)'? (into|from) (?:'(.+)'|[^\/]+\/(.+))")
+GET_COMMIT_MESSAGE = re.compile(r"Merge (branch|pull request) '?([^']+)'? (into|from) (?:'(.+)'|[^\/]+\/(.+))\n")
 
 class SemVer(object):
 
