@@ -31,7 +31,7 @@ def get_version(build=0,version_format=None,dot=False):
             bump_output = p.stdout.read().decode('utf-8').rstrip()
             next_version = re.search("new_version=([0-9]*.[0-9]*.[0-9]*)", bump_output).group(1)
 
-            if version_format in ('npm','docker'i):
+            if version_format in ('npm','docker'):
                 return "{}-{}.{}".format(next_version,branch.replace('/','-'),build)
             if version_format == 'maven':
                 qualifier = 'SNAPSHOT' if build == 0 else build
