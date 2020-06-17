@@ -11,3 +11,4 @@ def call(flags='') {
     VERSION = sh(returnStdout: true, script: "semver_get_version ${flags}")
     return VERSION.trim()
 }
+

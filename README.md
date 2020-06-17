@@ -49,7 +49,7 @@ tag_name = v{new_version}
 message = Bump version: {current_version} -> {new_version}
 ```
 
-The `current_version` exists to tell bumpversion what the current version is. To have auto-semver manage this value, set it to `0.0.0`. The `commit` and `tag` options determine whether to create a new Git commit and a new Git tag, respectively. The `tag_name` represents what the name of the Git tag will be, and by default is set to `{new_version}`, which will be substitued with the new version during runtime. This can be changed as desired - for example, `v{new_version}` could resolve to `v1.15.5`. The `message` option is what the message used if there is a git commit.
+The `current_version` exists to tell bumpversion what the current version is. Auto-semver uses this value as the default version if not version if found in the tags. The `commit` and `tag` options determine whether to create a new Git commit and a new Git tag, respectively. The `tag_name` represents what the name of the Git tag will be, and by default is set to `{new_version}`, which will be substitued with the new version during runtime. This can be changed as desired - for example, `v{new_version}` could resolve to `v1.15.5`. The `message` option is what the message used if there is a git commit.
 
 ### File updates
 
@@ -118,16 +118,32 @@ Does not push after versioning.
 
 Shows helps screen.
 
+`-D`/`--debug`
+
+Runs with debug logging.
+
 <a name="semver_get_version"></a>
 ### semver_get_version
 
-The `semver_get_version` command returns the version number if the `semver` command exited `0`. If `semver` exited anything else, `semver_get_version` will return the branch name.
+The `semver_get_version` command returns the version number if the `semver` command exited `0`. If `semver` exited anything else, `semver_get_version` will return the branch name, or a pre-release version if format is specified
 
 #### Flags
 
 `-d`
 
 Replaces `/` with `.` in branch names. For example, `feature/test` becomes `feature.test`
+
+`-D`/`--debug`
+
+Runs with debug logging.
+
+`-f`/`--format` `(npm|maven)`
+
+Formats the output for a pre-release version for a specific repository type. For example, `feature/test` becomes `0.1.0-feature-test-SNAPSHOT` for maven with no build number, or `0.1.0-feature-test.0` for maven with no build number.
+
+`-b`/`--build-number` `number`
+
+Provides a build number for pre-release versions.
 
 ### Jenkins Shared Library
 

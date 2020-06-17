@@ -1,7 +1,8 @@
 import argparse
 import re
 import subprocess
-from semver.get_version import get_tag_version
+from semver.utils import get_tag_version
+from semver.logger import logging, logger, console_logger
 
 try: 
     from configparser import ConfigParser
@@ -17,9 +18,11 @@ NO_MERGE_FOUND = Exception('No merge found')
 NOT_MAIN_BRANCH = Exception('Not merging into a main branch')
 NO_GIT_FLOW = Exception('No git flow branch found')
 
+# Important regex
+GET_COMMIT_MESSAGE = re.compile(r"Merge (branch|pull request) '?([^']+)'? (into|from) (?:'(.+)'|[^\/]+\/([^\n\\]+))")
+
 class SemVer(object):
 
-    GET_COMMIT_MESSAGE = re.compile(r"Merge (branch|pull request) '?(.+)'? (into|from) ([\w/-]+)")
     # Merge pull request #1 from RightBrain-Networks/feature/PLAT-185-versioning
 
     def __init__(self,global_user=False):
@@ -41,7 +44,6 @@ class SemVer(object):
         return list(filter(bool, [v.strip() for v in value.split(',')]))
 
     # based on commit message see what branches are involved in the merge
-    
     def get_branches(self):
         p = subprocess.Popen(['git', 'log', '-1'], stdout=subprocess.PIPE,
                              cwd='.')
@@ -50,19 +52,19 @@ class SemVer(object):
                              cwd='.')
         message = str(p.stdout.read())
         branch = b.stdout.read().decode('utf-8').rstrip()
-        print('Main branch is ' + branch)
-        matches = self.GET_COMMIT_MESSAGE.search(message)
+        logger.info('Main branch is ' + branch)
+        matches = GET_COMMIT_MESSAGE.search(message)
         if matches:
             if str(matches.group(4)) == branch:
                 self.merged_branch = matches.group(2)
             else:
-                self.merged_branch = matches.group(4)
+                self.merged_branch = matches.group(5)
             self.main_branch = branch
         return bool(matches)
 
     # based on branches involved see what type of versioning should be done
     def get_version_type(self):
-        print('Merged branch is ' + self.merged_branch)
+        logger.info('Merged branch is ' + self.merged_branch)
 
         merged_prefix = None
         matches = re.findall("[^\/]*/", self.merged_branch)
@@ -73,15 +75,15 @@ class SemVer(object):
             for prefix in self.major_branches:
                 if prefix == merged_prefix:
                     self.version_type = 'major'
-                    return True
+                    return self.version_type
             for prefix in self.minor_branches:
                 if prefix == merged_prefix:
                     self.version_type = 'minor'
-                    return True
+                    return self.version_type
             for prefix in self.patch_branches:
                 if prefix == merged_prefix:
                     self.version_type = 'patch'
-                    return True
+                    return self.version_type
         return False
 
     # setup git settings so we can commit and tag
@@ -101,17 +103,9 @@ class SemVer(object):
         config_file = ""
         with open(".bumpversion.cfg", "r") as file:
             config_file = file.read()
-        # Update .bumpconfig
-        #pattern = re.compile("current_version = [0-9.]*")
-        #current_config = re.search(pattern, config_file)
-        #if current_config:
-            #config_file.replace(current_config.group(0), "current_version = " + get_tag_version())
-        #else:
-            #config_file.replace("[bumpversion]","[bumpversion]\ncurrent_version = " + get_tag_version())
-        #with open(".bumpversion.cfg", "w") as file:
-            #file.write(config_file)
 
         # version repo
+        logger.debug("Running bumpversion of type: " + self.version_type)
         p = subprocess.Popen(['bumpversion', '--current-version', get_tag_version(), self.version_type],
                              cwd='.')
         p.wait()
@@ -152,10 +146,16 @@ def main():
         parser = argparse.ArgumentParser(description='Bump Semantic Version.')
         parser.add_argument('-n','--no-push', help='Do not try to push', action='store_false', dest='push')
         parser.add_argument('-g','--global-user', help='Set git user at a global level, helps in jenkins', action='store_true', dest='global_user')
+        parser.add_argument('-D', '--debug', help='Sets logging level to DEBUG', action='store_true', dest='debug', default=False)
         args = parser.parse_args()
+
+
+        if args.debug:
+            console_logger.setLevel(logging.DEBUG)
+
         SemVer(global_user=args.global_user).run(push=args.push)
     except Exception as e:
-        print(e)
+        logger.error(e)
         if e == NO_MERGE_FOUND:
             exit(1)
         elif e == NOT_MAIN_BRANCH:
