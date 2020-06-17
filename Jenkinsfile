@@ -8,7 +8,7 @@ pipeline {
     GITHUB_URL = 'git@github.com:RightBrain-Networks/auto-semver.git'
     GITHUB_KEY = 'rbn-ops github'
     DOCKER_CREDENTIALS = 'rbnopsDockerHubToken'
-    PYPI_CREDENTIALS = 'rbn_pypi_password'
+    PYPI_CREDENTIALS = 'rbn_pypi_token'
 
     SERVICE = 'auto-semver'
     SELF_SEMVER_TAG = "master" //Image tag to use for self-versioning
@@ -89,13 +89,6 @@ pipeline {
               dockerImage.push("${env.VERSION}")
             }
           }
-          script
-          {
-            if("${env.SEMVER_STATUS}" == "0" && "${env.BRANCH_NAME}"  == "master")
-            {
-              dockerImage.push('latest')
-            }
-          }
 
       }
       post
@@ -109,31 +102,35 @@ pipeline {
         }
       }
     }
-    stage('Release Packages')
+    stage('Release')
     {
       when {
           expression {
               "${env.SEMVER_STATUS}" == "0" && "${env.BRANCH_NAME}"  == "master"
           }
       }
-      agent {
-          docker {
-              image "rightbrainnetworks/auto-semver:${env.VERSION}"
-          }
-      }
       steps
       {
+        script
+        {
+          dockerImage.push('latest')
+        }
+
         // Create GitHub Release & Upload Artifacts
         createGitHubRelease('rbn-opsGitHubToken', 'RightBrain-Networks/auto-semver', "${env.SEMVER_RESOLVED_VERSION}",
           "${env.SEMVER_RESOLVED_VERSION}", ["auto-semver.tar.gz" : "dist/semver-${env.SEMVER_NEW_VERSION}.tar.gz"])
 
 
         // Upload package to PyPi
-        withCredentials([usernamePassword(credentialsId: env.PYPI_CREDENTIALS, usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
-          sh("pip install twine")
-          sh("twine upload dist/* --verbose -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD}")
+        script
+        {
+          docker.image("rightbrainnetworks/auto-semver:${env.VERSION}").inside()
+          {
+            withCredentials([string(credentialsId: env.PYPI_CREDENTIALS, variable: 'PYPI_PASSWORD')]) {
+              sh("twine upload dist/* --verbose -u __token__ -p ${PYPI_PASSWORD}")
+            }
+          }
         }
-
       }
       post
       {
