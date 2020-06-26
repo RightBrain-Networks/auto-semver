@@ -1,7 +1,7 @@
 import unittest, os, subprocess, re, semver
 from semver.logger import logging, logger, console_logger
 
-from semver import get_version, utils, NO_MERGE_FOUND, GET_COMMIT_MESSAGE, bump
+from semver import bump, get_version, utils, NO_MERGE_FOUND, GET_COMMIT_MESSAGE
 
 config_data = """
 [bumpversion]
@@ -9,6 +9,10 @@ current_version = 0.0.0
 commit = False
 tag = True
 tag_name = {new_version}
+
+[bumpversion:file:file.txt]
+search = 0.0.0
+replace = {new_version}
 
 [semver]
 main_branches = master
@@ -183,7 +187,38 @@ class TestVersionBumping(unittest.TestCase):
         self.assertEqual("1.0.0", bump.bump_version("0.0.10", semver.VersionType.MAJOR, False))
         self.assertEqual("1.0.0", bump.bump_version("0.10.0", semver.VersionType.MAJOR, False))
         self.assertEqual("11.0.0", bump.bump_version("10.0.0", semver.VersionType.MAJOR, False))
+class TestFileVersioning(unittest.TestCase):
+    def test_file_bump(self):
+        with open('file.txt', 'w') as f:
+            f.write("0.0.0")
+        bump.update_file_version("12.34.56")
+        
+        file_data = ""
+        with open('file.txt', 'r') as f:
+            file_data = f.read()
 
+        self.assertEqual("12.34.56", file_data)
+    def test_file_bump_with_text(self):
+        with open('file.txt', 'w') as f:
+            f.write("version = 0.0.0")
+        bump.update_file_version("12.34.56")
+        
+        file_data = ""
+        with open('file.txt', 'r') as f:
+            file_data = f.read()
+
+        self.assertEqual("version = 12.34.56", file_data)
+    def test_file_bump_with_multiline(self):
+        with open('file.txt', 'w') as f:
+            f.write("version = 0.0.0\n#An example second line\nThird line!")
+        bump.update_file_version("12.34.56")
+        
+        file_data = ""
+        with open('file.txt', 'r') as f:
+            file_data = f.read()
+
+        self.assertEqual("version = 12.34.56", file_data.split('\n')[0])
+    
 def create_git_environment():
     subprocess.call(['rm', '-rf', './.git'])
     subprocess.call(['git', 'init'])
