@@ -98,7 +98,6 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'bump2version>=0.5.11',
         'argparse>=1.2.1'
     ],
 

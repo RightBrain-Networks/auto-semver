@@ -1,1 +1,5 @@
-bumpversion==0.5.3
+# requirements.txt
+#
+# installs dependencies from ./setup.py, and the package itself,
+# in editable mode
+-e .

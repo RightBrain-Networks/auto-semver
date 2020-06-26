@@ -1,7 +1,7 @@
 import unittest, os, subprocess, re, semver
 from semver.logger import logging, logger, console_logger
 
-from semver import get_version, utils, NO_MERGE_FOUND, GET_COMMIT_MESSAGE
+from semver import get_version, utils, NO_MERGE_FOUND, GET_COMMIT_MESSAGE, bump
 
 config_data = """
 [bumpversion]
@@ -25,17 +25,17 @@ class TestSemverObject(unittest.TestCase):
         semver_object = semver.SemVer()
         semver_object.merged_branch = "major/unittest"
         semver_object.get_version_type()
-        self.assertEqual(semver_object.version_type, "major")
+        self.assertEqual(semver_object.version_type, semver.VersionType.MAJOR)
     def test_get_version_type_minor_merge(self):
         semver_object = semver.SemVer()
         semver_object.merged_branch = "minor/unittest"
         semver_object.get_version_type()
-        self.assertEqual(semver_object.version_type, "minor")
+        self.assertEqual(semver_object.version_type, semver.VersionType.MINOR)
     def test_get_version_type_patch_merge(self):
         semver_object = semver.SemVer()
         semver_object.merged_branch = "patch/unittest"
         semver_object.get_version_type()
-        self.assertEqual(semver_object.version_type, "patch")
+        self.assertEqual(semver_object.version_type, semver.VersionType.PATCH)
     def test_run_no_merge(self):
         semver_object = semver.SemVer()
         try:
@@ -154,6 +154,35 @@ class TestGetCommitMessageRegex(unittest.TestCase):
     def test_non_merge_message(self):
         matches = GET_COMMIT_MESSAGE.search("Example unrelated commit message that should get 0 matches")
         self.assertEqual(matches, None)
+
+class TestVersionBumping(unittest.TestCase):
+    def test_patch_bump(self):
+        self.assertEqual("0.0.1", bump.bump_version("0.0.0", semver.VersionType.PATCH, False))
+        self.assertEqual("0.0.2", bump.bump_version("0.0.1", semver.VersionType.PATCH, False))
+        self.assertEqual("0.1.1", bump.bump_version("0.1.0", semver.VersionType.PATCH, False))
+        self.assertEqual("1.0.1", bump.bump_version("1.0.0", semver.VersionType.PATCH, False))
+        self.assertEqual("1.2.4", bump.bump_version("1.2.3", semver.VersionType.PATCH, False))
+        self.assertEqual("0.0.11", bump.bump_version("0.0.10", semver.VersionType.PATCH, False))
+        self.assertEqual("0.10.1", bump.bump_version("0.10.0", semver.VersionType.PATCH, False))
+        self.assertEqual("10.0.1", bump.bump_version("10.0.0", semver.VersionType.PATCH, False))
+    def test_minor_bump(self):
+        self.assertEqual("0.1.0", bump.bump_version("0.0.0", semver.VersionType.MINOR, False))
+        self.assertEqual("0.1.0", bump.bump_version("0.0.1", semver.VersionType.MINOR, False))
+        self.assertEqual("0.2.0", bump.bump_version("0.1.0", semver.VersionType.MINOR, False))
+        self.assertEqual("1.1.0", bump.bump_version("1.0.0", semver.VersionType.MINOR, False))
+        self.assertEqual("1.3.0", bump.bump_version("1.2.3", semver.VersionType.MINOR, False))
+        self.assertEqual("0.1.0", bump.bump_version("0.0.10", semver.VersionType.MINOR, False))
+        self.assertEqual("0.11.0", bump.bump_version("0.10.0", semver.VersionType.MINOR, False))
+        self.assertEqual("10.1.0", bump.bump_version("10.0.0", semver.VersionType.MINOR, False))
+    def test_major_bump(self):
+        self.assertEqual("1.0.0", bump.bump_version("0.0.0", semver.VersionType.MAJOR, False))
+        self.assertEqual("1.0.0", bump.bump_version("0.0.1", semver.VersionType.MAJOR, False))
+        self.assertEqual("1.0.0", bump.bump_version("0.1.0", semver.VersionType.MAJOR, False))
+        self.assertEqual("2.0.0", bump.bump_version("1.0.0", semver.VersionType.MAJOR, False))
+        self.assertEqual("2.0.0", bump.bump_version("1.2.3", semver.VersionType.MAJOR, False))
+        self.assertEqual("1.0.0", bump.bump_version("0.0.10", semver.VersionType.MAJOR, False))
+        self.assertEqual("1.0.0", bump.bump_version("0.10.0", semver.VersionType.MAJOR, False))
+        self.assertEqual("11.0.0", bump.bump_version("10.0.0", semver.VersionType.MAJOR, False))
 
 def create_git_environment():
     subprocess.call(['rm', '-rf', './.git'])
