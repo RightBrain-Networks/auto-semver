@@ -12,7 +12,8 @@ RUN yum -y install git
 #Setup semver
 ADD / /semver
 WORKDIR /semver
-RUN python setup.py sdist
+RUN pip install wheel twine
+RUN python setup.py sdist bdist_wheel
 RUN pip install dist/semver-*.tar.gz
 
 # Prep workspace
