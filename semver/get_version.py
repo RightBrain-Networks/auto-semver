@@ -4,6 +4,7 @@ import subprocess
 from semver.logger import logging, logger, console_logger
 from semver.utils import get_tag_version, get_file_version, DEVNULL
 from semver import SemVer
+from semver.bump import bump_version
 
 def get_version(build=0,version_format=None,dot=False):
     version = get_tag_version()
@@ -27,9 +28,8 @@ def get_version(build=0,version_format=None,dot=False):
         version_type = semver.get_version_type()
         logger.debug("version type is: {}".format(version_type))
         if version_type:
-            p = subprocess.Popen(['bumpversion', '--dry-run', '--verbose', '--current-version', get_tag_version(), version_type], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd='.')
-            bump_output = p.stdout.read().decode('utf-8').rstrip()
-            next_version = re.search("new_version=([0-9]*.[0-9]*.[0-9]*)", bump_output).group(1)
+
+            next_version = bump_version(get_tag_version(), version_type, False, False)
 
             if version_format in ('npm','docker'):
                 return "{}-{}.{}".format(next_version,branch.replace('/','-'),build)

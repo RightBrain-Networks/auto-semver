@@ -2,7 +2,7 @@
 
 # Automatic Semantic Versioning
 
-This code repository extends/wraps the bumpversion library to automatically determine which type of increment (Major, Minor, Patch) to perform based on git branch names.
+This code repository automatically determines which type of increment (Major, Minor, Patch) to perform based on git branch names.
 The tool uses the git log to determine if the last commit was a merge into a main line branch, and if it was, detect the name of the branch being merged in. If the name of the branch begins with one of the key words provided to the configuration file, a new version is produced.
 
 ***It is important to note that the tool performs actions on a local Git repository. After completion, it will be necessary to do a `git push --tags` if a commit and/or tag are created***
@@ -15,9 +15,9 @@ auto-semver is a pip installable package to install, make sure pip is installed 
 
 ## Configuration
 
-There are two configuration files that must appear in the top directory of repository for which we want to update the version. These files are `VERSION` and `.bumpversion.cfg`.
+There is one configuration file that must appear in the top directory of repository for which we want to update the version, `.bumpversion.cfg`.
 
-Below is an example configuration of a `.bumpversion.cfg` file using commits:
+Below is an example configuration of a `.bumpversion.cfg` file:
 
 ```ini
 [bumpversion]
