@@ -1,2 +1,5 @@
-bump2version>=0.5.11
-argparse>=1.2.1
+# requirements.txt
+#
+# installs dependencies from ./setup.py, and the package itself,
+# in editable mode
+-e .

@@ -1,8 +1,10 @@
 import argparse
 import re
 import subprocess
+from enum import IntEnum
 from semver.utils import get_tag_version
 from semver.logger import logging, logger, console_logger
+from semver.bump import bump_version
 
 try: 
     from configparser import ConfigParser
@@ -12,6 +14,10 @@ except ImportError:
 
 version = '0.0.0'
 
+class VersionType(IntEnum):
+    MAJOR = 0
+    MINOR = 1
+    PATCH = 2
 
 # Define common exceptions;
 NO_MERGE_FOUND = Exception('No merge found')
@@ -74,15 +80,15 @@ class SemVer(object):
         if merged_prefix:
             for prefix in self.major_branches:
                 if prefix == merged_prefix:
-                    self.version_type = 'major'
+                    self.version_type = VersionType.MAJOR
                     return self.version_type
             for prefix in self.minor_branches:
                 if prefix == merged_prefix:
-                    self.version_type = 'minor'
+                    self.version_type = VersionType.MINOR
                     return self.version_type
             for prefix in self.patch_branches:
                 if prefix == merged_prefix:
-                    self.version_type = 'patch'
+                    self.version_type = VersionType.PATCH
                     return self.version_type
         return False
 
@@ -106,9 +112,7 @@ class SemVer(object):
 
         # version repo
         logger.debug("Running bumpversion of type: " + self.version_type)
-        p = subprocess.Popen(['bumpversion', '--current-version', get_tag_version(), self.version_type],
-                             cwd='.')
-        p.wait()
+        bump_version(get_tag_version(), self.version_type)
         return self
 
     def commit_and_push(self):

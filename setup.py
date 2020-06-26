@@ -71,7 +71,6 @@ setup(
     keywords='Semantic,Version,CICD,Pipeline,Versioning',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     install_requires=[
-        'bump2version>=0.5.11',
         'argparse>=1.2.1'
     ],
     package_data={},
