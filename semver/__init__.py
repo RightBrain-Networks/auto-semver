@@ -61,7 +61,7 @@ class SemVer(object):
         message = str(p.stdout.read())
         branch = b.stdout.read().decode('utf-8').rstrip()
         logger.info('Main branch is ' + branch)
-        matches = GET_COMMIT_MESSAGE.search(message)
+        matches = GET_COMMIT_MESSAGE.search(message.replace('\\n','\n').replace('\\',''))
         if matches:
             if str(matches.group(4)) == branch:
                 self.merged_branch = matches.group(2)
