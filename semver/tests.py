@@ -158,6 +158,13 @@ class TestGetCommitMessageRegex(unittest.TestCase):
     def test_non_merge_message(self):
         matches = GET_COMMIT_MESSAGE.search("Example unrelated commit message that should get 0 matches")
         self.assertEqual(matches, None)
+    def test_gitlab_merge_with_double_quotes(self):
+        matches = GET_COMMIT_MESSAGE.search("Merge branch 'branch' into 'master'\n\n\"Message in quotes!\"")
+        if matches:
+            self.assertEqual(matches.group(4), "master")
+            self.assertEqual(matches.group(2), "branch")
+        else:
+            self.assertTrue(False)
 
 class TestVersionBumping(unittest.TestCase):
     def test_patch_bump(self):
