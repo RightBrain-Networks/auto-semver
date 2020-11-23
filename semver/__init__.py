@@ -1,6 +1,8 @@
 import argparse
 import re
 import subprocess
+import sys
+import traceback
 from enum import IntEnum
 from semver.utils import get_tag_version
 from semver.logger import logging, logger, console_logger
@@ -59,7 +61,7 @@ class SemVer(object):
         message = str(p.stdout.read())
         branch = b.stdout.read().decode('utf-8').rstrip()
         logger.info('Main branch is ' + branch)
-        matches = GET_COMMIT_MESSAGE.search(message)
+        matches = GET_COMMIT_MESSAGE.search(message.replace('\\n','\n').replace('\\',''))
         if matches:
             if str(matches.group(4)) == branch:
                 self.merged_branch = matches.group(2)
@@ -111,7 +113,7 @@ class SemVer(object):
             config_file = file.read()
 
         # version repo
-        logger.debug("Running bumpversion of type: " + self.version_type)
+        logger.debug("Running bumpversion of type: " + str(self.version_type.name))
         bump_version(get_tag_version(), self.version_type)
         return self
 
@@ -146,20 +148,22 @@ class SemVer(object):
         return self
 
 def main():
+    parser = argparse.ArgumentParser(description='Bump Semantic Version.')
+    parser.add_argument('-n','--no-push', help='Do not try to push', action='store_false', dest='push')
+    parser.add_argument('-g','--global-user', help='Set git user at a global level, helps in jenkins', action='store_true', dest='global_user')
+    parser.add_argument('-D', '--debug', help='Sets logging level to DEBUG', action='store_true', dest='debug', default=False)
+    args = parser.parse_args()
+
+
+    if args.debug:
+        console_logger.setLevel(logging.DEBUG)
     try:
-        parser = argparse.ArgumentParser(description='Bump Semantic Version.')
-        parser.add_argument('-n','--no-push', help='Do not try to push', action='store_false', dest='push')
-        parser.add_argument('-g','--global-user', help='Set git user at a global level, helps in jenkins', action='store_true', dest='global_user')
-        parser.add_argument('-D', '--debug', help='Sets logging level to DEBUG', action='store_true', dest='debug', default=False)
-        args = parser.parse_args()
-
-
-        if args.debug:
-            console_logger.setLevel(logging.DEBUG)
-
         SemVer(global_user=args.global_user).run(push=args.push)
     except Exception as e:
         logger.error(e)
+        if args.debug:
+            tb = sys.exc_info()[2]
+            traceback.print_tb(tb)
         if e == NO_MERGE_FOUND:
             exit(1)
         elif e == NOT_MAIN_BRANCH:

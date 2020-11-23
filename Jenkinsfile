@@ -1,4 +1,4 @@
-library('pipeline-library')
+library('pipeline-library@bugfix/durable-task-workaround')
 
 pipeline {
   options { timestamps() }
@@ -18,7 +18,7 @@ pipeline {
     stage('Self Version') {
       steps {
         withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-          sh("docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}")
+          sh("docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD")
         }
         runAutoSemver("rightbrainnetworks/auto-semver:${SELF_SEMVER_TAG}")
       }
@@ -59,6 +59,7 @@ pipeline {
       agent {
           docker {
               image "rightbrainnetworks/auto-semver:${env.VERSION}"
+              args "--privileged"
           }
       }
       steps
@@ -85,7 +86,7 @@ pipeline {
           // Authenticate & push to DockerHub
           withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
             sh("""
-              docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+              docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
               docker push rightbrainnetworks/auto-semver:${env.VERSION}
               """)
           }
