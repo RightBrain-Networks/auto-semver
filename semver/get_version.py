@@ -32,10 +32,10 @@ def get_version(build=0,version_format=None,dot=False):
             next_version = bump_version(get_tag_version(), version_type, False, False)
 
             if version_format in ('npm','docker'):
-                return "{}-{}.{}".format(next_version,branch.replace('/','-'),build)
+                return "{}-{}.{}".format(next_version,re.sub(r'[/_]', '-', branch),build)
             if version_format == 'maven':
                 qualifier = 'SNAPSHOT' if build == 0 else build
-                return "{}-{}-{}".format(next_version,branch.replace('/','-'),qualifier)
+                return "{}-{}-{}".format(next_version,re.sub(r'[/_]', '-', branch),qualifier)
         if dot:
             branch = branch.replace('/','.')
         return branch
