@@ -16,12 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: python setup.py sdist
+      - run: python3 setup.py sdist
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: python tests.py
+      - run: python3 tests.py
         working-directory: semver
   push:
     runs-on: ubuntu-latest
