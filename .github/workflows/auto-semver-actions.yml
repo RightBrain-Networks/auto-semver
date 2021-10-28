@@ -21,8 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: python3 tests.py
-        working-directory: semver
+      - run: python3 semver/tests.py
   push:
     runs-on: ubuntu-latest
     steps:
