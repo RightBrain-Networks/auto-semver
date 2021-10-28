@@ -11,9 +11,11 @@ jobs:
     runs-on: ubuntu-latest 
     steps:
       - uses: actions/checkout@v2
+      - run: pip3 install auto-semver
       - run: pip3 install -e .
   build:
     runs-on: ubuntu-latest
+    needs: self-version
     steps:
       - uses: actions/checkout@v2
       - run: python3 setup.py sdist
