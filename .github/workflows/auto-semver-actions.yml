@@ -3,7 +3,6 @@ on: [push]
 env:
   GITHUB_URL: 'git@github.com:RightBrain-Networks/auto-semver.git'
   GITHUB_KEY: 'rbn-ops github'
-  DOCKER_CREDENTIALS: 'rbnopsDockerHubToken'
 
   SERVICE: 'auto-semver'
   SELF_SEMVER_TAG: "master"
@@ -33,5 +32,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: docker tag rightbrainnetworks/auto-semver:${env.VERSION} rightbrainnetworks/auto-semver:latest
-      - run: docker push rightbrainnetworks/auto-semver:latest
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+          prerelease: false
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish release
+        uses: auto-semver/publish-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          id: ${{ steps.create_release.outputs.id }}
