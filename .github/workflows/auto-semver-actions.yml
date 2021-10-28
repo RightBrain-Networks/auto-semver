@@ -1,12 +1,37 @@
 name: auto-semver-actions
 on: [push]
+env:
+  GITHUB_URL: 'git@github.com:RightBrain-Networks/auto-semver.git'
+  GITHUB_KEY: 'rbn-ops github'
+  DOCKER_CREDENTIALS: 'rbnopsDockerHubToken'
+
+  SERVICE: 'auto-semver'
+  SELF_SEMVER_TAG: "master"
 jobs:
-  check-version:
+  self-version:
+    runs-on: ubuntu-latest 
+    steps:
+      - uses: actions/checkout@v2
+      - run: pip install autosemver
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-      - run: npm install -g bats
-      - run: bats -v
+      - run: python setup.py sdist
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: python tests.py
+        working-directory: semver
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: aws s3 cp `ls -t ./dist/semver-* | head -1` s3://rbn-ops-pkg-us-east-1/${env.SERVICE}/${env.SERVICE}-${env.VERSION}.tar.gz
+  publish-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker tag rightbrainnetworks/auto-semver:${env.VERSION} rightbrainnetworks/auto-semver:latest
+      - run: docker push rightbrainnetworks/auto-semver:latest
