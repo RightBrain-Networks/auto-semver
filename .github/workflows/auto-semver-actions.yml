@@ -29,8 +29,7 @@ jobs:
       - name: Test
         run: |
           python tests.py
-        with:
-          working-directory: semver
+        working-directory: semver
   release:
     runs-on: ubuntu-latest
     needs: build
