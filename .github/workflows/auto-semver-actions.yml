@@ -28,8 +28,6 @@ jobs:
         run: python setup.py sdist
       - name: Test
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
           python tests.py
         working-directory: semver
   release:
