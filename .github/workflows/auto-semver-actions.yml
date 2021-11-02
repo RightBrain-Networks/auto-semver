@@ -27,27 +27,29 @@ jobs:
       - name: build
         run: |
           python setup.py sdist
-      - name: test
-        run: |
-          python tests.py
-        working-directory: semver
-  release:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout code
+      #- name: test
+       # run: |
+        #  python tests.py
+        #working-directory: semver
+    CheckVersion:
+      runs-on: ubuntu-latest
+      needs: build
+      steps:
+      - name: Checkout
         uses: actions/checkout@v2
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      - name: Run Auto-Semver          
+        id: semver
+        uses: RightBrain-Networks/semver-action@1.0.0
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
+          mode: set
+      - name: Create Release
+        uses: actions/create-release@v2
+        if: steps['semver']['outputs']['RETURN_STATUS'] == '0'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.semver.outputs.SEMVER_NEW_VERSION }}
+          release_name: ${{ steps.semver.outputs.SEMVER_NEW_VERSION }}
+          body: Version ${{ steps.semver.outputs.SEMVER_NEW_VERSION }} released automatically by [RightBrain-Networks/auto-semver](https://github.com/RightBrain-Networks/auto-semver)
           draft: false
           prerelease: false
