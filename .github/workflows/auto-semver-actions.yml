@@ -43,7 +43,7 @@ jobs:
       with:
         mode: set
     - name: Create Release
-      uses: actions/create-release@v2
+      uses: actions/create-release@v1
       if: steps['semver']['outputs']['RETURN_STATUS'] == '0'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
