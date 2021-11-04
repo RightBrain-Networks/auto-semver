@@ -225,6 +225,8 @@ def create_git_environment():
     subprocess.call(['rm', '-rf', './.git'])
     subprocess.call(['git', 'init'])
     subprocess.call(['touch', 'file.txt'])
+    subprocess.call(['git', 'config', '--global', 'user.name', 'unit-test'])
+    subprocess.call(['git', 'config', '--global', 'user.email', 'unit-test@rightbrainnetworks.com'])
     subprocess.call(['git', 'add', 'file.txt'])
     subprocess.call(['git', 'commit', '-m', 'file.txt'])
     subprocess.call(['git', 'remote', 'add', 'origin', os.getcwd()+'/.git'])
