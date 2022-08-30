@@ -23,9 +23,10 @@ def bump_version(version, index=2, tag_repo = True, update_files=True):
 
     # Get new version
     new_version = '.'.join(v)
-
+    logger.debug("new_version: {}", new_version)
     # Tag new version
     if tag_repo and version != new_version:
+        logger.debug("Tagging repository.")
         p = subprocess.Popen(['git', 'tag', new_version], cwd='.')
         p.wait()
     
@@ -37,6 +38,7 @@ def bump_version(version, index=2, tag_repo = True, update_files=True):
 
 def update_file_version(new_version, version="0.0.0"):
     # Open up config file
+    logger.debug("Update file version with {}", new_version)
     config = ConfigParser()
     config.read('./.bumpversion.cfg')
 
