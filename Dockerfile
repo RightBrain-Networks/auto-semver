@@ -15,15 +15,4 @@ WORKDIR /semver
 RUN python setup.py sdist
 RUN pip install dist/semver-*.tar.gz
 
-# Prep workspace
-RUN mkdir /workspace
-WORKDIR /workspace
-VOLUME /workspace
-
-#Permissions
-RUN useradd -d /semverUser semverUser
-RUN chown -R semverUser:semverUser /workspace
-
 CMD [ "semver" ]
-
-USER semverUser
