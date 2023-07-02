@@ -8,41 +8,33 @@ from semver.logger import logger
 class SCM(ABC):
     @abstractmethod
     def get_tag_version(self) -> str:
-        raise NotImplementedError
+        raise NotImplementedError()
 
     @abstractmethod
     def get_branch(self) -> str:
-        raise NotImplementedError
+        raise NotImplementedError()
 
     @abstractmethod
     def get_merge_branch(self) -> Union[str, None]:
-        raise NotImplementedError
+        raise NotImplementedError()
 
     @abstractmethod
     def commit_and_push(self, branch: str) -> None:
-        raise NotImplementedError
+        raise NotImplementedError()
 
     @abstractmethod
     def tag_version(self, version: str) -> None:
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def get_file_version(self, config: dict) -> str:
         """
         :param config: The bumpversion config as a dict
         :return: The current version from the config file
         """
-        bumpversion: Union[str, None] = config.get("bumpversion", None)
-        version: Union[str, None] = (
-            bumpversion.get("current_version", None) if bumpversion else None
+        bump_version: Union[str, None] = config.get("bumpversion", None)
+        version: str = (
+            bump_version.get("current_version", "0.0.0") if bump_version else "0.0.0"
         )
-
-        if not bumpversion:
-            config["bumpversion"] = {}
-            version = "0.0.0"
-
-        if not version:
-            config["bumpversion"]["current_version"] = "0.0.0"
-            version = "0.0.0"
 
         return version
 

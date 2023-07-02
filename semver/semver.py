@@ -44,16 +44,17 @@ class SemVer:
 
         self._scm: SCM = scm
 
-    def _version_repo(self) -> None:
+    def _version_repo(self) -> str:
         """
         Use bump_version to update the repo version
+        :return: The new version
         """
         version = self._scm.get_tag_version()
         if not self._version_type:
             raise NoMergeFoundException()
 
         logger.debug(f"Running bumpversion of type: {self._version_type.name}")
-        self._bump_version(version, self._version_type)
+        return self._bump_version(version, self._version_type)
 
     def _process_config_string(self, cfg_string, new_version, version):
         return cfg_string.replace("{new_version}", new_version).replace(

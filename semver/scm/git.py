@@ -26,12 +26,14 @@ class Git(SCM):
 
         super().__init__()
 
-    def _run_command(self, *args: str) -> subprocess.CompletedProcess[str]:
+    def _run_command(
+        self, *args: str, throwExceptions: bool = True
+    ) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
             args,
             capture_output=True,
             text=True,
-            check=True,
+            check=throwExceptions,
         )
 
     def _setup_git_user(self) -> None:
@@ -75,7 +77,7 @@ class Git(SCM):
             )
             tagged_versions = proc.stdout.rstrip().split("\n")
         except subprocess.CalledProcessError as e:
-            raise RuntimeError(
+            raise SemverException(
                 f"Error getting latest tagged git version: {str(e.stderr).rstrip()}"
             )
 
@@ -122,12 +124,16 @@ class Git(SCM):
         Commit and push the versioning changes
         :param branch: The branch to push
         """
-        proc = self._run_command(self.git_bin, "push", "origin", branch)
+        proc = self._run_command(
+            self.git_bin, "push", "origin", branch, throwExceptions=False
+        )
         if proc.returncode != 0:
             raise SemverException(
                 f"Error pushing versioning changes to {branch}: {proc.stderr}"
             )
-        proc = self._run_command(self.git_bin, "push", "origin", "--tags")
+        proc = self._run_command(
+            self.git_bin, "push", "origin", "--tags", throwExceptions=False
+        )
         if proc.returncode != 0:
             raise SemverException(
                 f"Error pushing versioning changes to {branch}: {proc.stderr}"

@@ -7,7 +7,6 @@ dist/
 *.zip
 env
 # Byte-compiled / optimized / DLL files
-tests/
 __pycache__/
 *.py[cod]
 *$py.class
