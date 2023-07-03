@@ -9,6 +9,7 @@ from semver.scm import SCM
 from semver.logger import logger
 from semver.version_type import VersionType
 from semver.exceptions import SemverException
+from semver.utils import get_settings
 
 
 class Git(SCM):
@@ -58,7 +59,7 @@ class Git(SCM):
         Get the latest tagged version from git tags
         :return: The latest tagged version
         """
-        config: dict = toml.load("./.bumpversion.cfg")
+        config: dict = get_settings()
 
         tag_expression: str = config["bumpversion"]["tag_name"].replace(
             "{new_version}", "[0-9]*.[0-9]*.[0-9]*"
@@ -91,6 +92,7 @@ class Git(SCM):
     def get_branch(self) -> str:
         """
         Get the main branch
+        :return: The main branch
         """
         proc = self._run_command(self.git_bin, "rev-parse", "--abbrev-ref", "HEAD")
         return proc.stdout.rstrip()
