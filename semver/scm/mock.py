@@ -18,3 +18,9 @@ class MockSCM(SCM):
 
     def tag_version(self, version: str) -> None:
         pass
+
+    def get_version_hash(self, version: str) -> str:
+        return "HASH"
+
+    def get_hash(self) -> str:
+        return "HASH"

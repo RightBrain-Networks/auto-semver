@@ -32,3 +32,14 @@ class TestMockSCM(unittest.TestCase):
     def test_tag_version(self):
         version = "1.0.0"
         self.scm.tag_version(version)
+
+    def test_get_version_hash(self):
+        version = "1.0.0"
+        expected_hash = "HASH"
+        version_hash = self.scm.get_version_hash(version)
+        self.assertEqual(version_hash, expected_hash)
+
+    def test_get_hash(self):
+        expected_hash = "HASH"
+        version_hash = self.scm.get_hash()
+        self.assertEqual(version_hash, expected_hash)

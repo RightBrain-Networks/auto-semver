@@ -1,5 +1,6 @@
 from typing import List, Union
 from pathlib import Path
+import re
 
 import toml
 
@@ -139,6 +140,52 @@ class SemVer:
                         f"Tried to version file: '{file_path}' but it doesn't exist!"
                     )
 
+    def get_version(
+        self, build: int = 0, version_format: Union[str, None] = None, dot: bool = False
+    ):
+        """
+        Get the version of the repo
+        :param build: The build number
+        :param version_format: The format of the version
+        :param dot: Whether or not to replace / with .
+        :return: The version
+        """
+        version = self._scm.get_tag_version()
+
+        # Get the commit hash of the version
+        v_hash = self._scm.get_version_hash(version)
+        # Get the current commit hash
+        c_hash = self._scm.get_hash()
+
+        # If the version commit hash and current commit hash
+        # do not match return the branch name else return the version
+        if v_hash != c_hash:
+            logger.debug("v_hash and c_hash do not match!")
+            branch = self._scm.get_branch()
+            logger.debug("merged branch is: {}".format(branch))
+            version_type = self._scm.get_version_type(
+                branch, self._major_branches, self._minor_branches, self._patch_branches
+            )
+            logger.debug("version type is: {}".format(version_type))
+            if version_type:
+                next_version = self._bump_version(
+                    self._scm.get_tag_version(), version_type, False, False
+                )
+
+                if version_format in ("npm", "docker"):
+                    return "{}-{}.{}".format(
+                        next_version, re.sub(r"[/_]", "-", branch), build
+                    )
+                if version_format == "maven":
+                    qualifier = "SNAPSHOT" if build == 0 else build
+                    return "{}-{}-{}".format(
+                        next_version, re.sub(r"[/_]", "-", branch), qualifier
+                    )
+            if dot:
+                branch = branch.replace("/", ".")
+            return branch
+        return version
+
     def run(self, push=True):
         """
         Run the versioning process
@@ -152,9 +199,9 @@ class SemVer:
         self._merged_branch = self._scm.get_merge_branch()
 
         if not self._merged_branch:
-            raise NoMergeFoundException()
+            raise NoMergeFoundException("No merge found")
         if self._branch not in self._main_branches:
-            raise NotMainBranchException()
+            raise NotMainBranchException("Not a main branch")
 
         self._version_type = self._scm.get_version_type(
             self._branch,
@@ -164,7 +211,7 @@ class SemVer:
         )
 
         if not self._version_type:
-            raise NoGitFlowException()
+            raise NoGitFlowException("Could not determine version type")
 
         self._version_repo()
         if push:

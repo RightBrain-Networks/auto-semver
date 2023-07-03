@@ -12,7 +12,7 @@ from semver.exceptions import (
 )
 
 
-class TestSCM(unittest.TestCase):
+class TestSemVer(unittest.TestCase):
     def setUp(self):
         scm = mock.MagicMock(MockSCM())
         self.semver: SemVer = SemVer(scm=scm)
@@ -142,3 +142,52 @@ class TestSCM(unittest.TestCase):
 
         with self.assertRaises(NoGitFlowException):
             self.semver.run()
+
+    @mock.patch("semver.semver.SemVer._bump_version")
+    def test_get_version(self, mock_bump_version: mock.Mock):
+        self.semver._scm.get_branch.return_value = "feature/example"
+        self.semver._scm.get_tag_version.return_value = "1.0.0"
+        self.semver._scm.get_version_hash.return_value = "HASH"
+        self.semver._scm.get_hash.return_value = "ALT_HASH"
+
+        mock_bump_version.return_value = "1.0.1"
+
+        expected_version = "1.0.0+HASH"
+        version = self.semver.get_version(dot=True)
+        self.assertEqual(version, "feature.example")
+
+    @mock.patch("semver.semver.SemVer._bump_version")
+    def test_get_version_docker(self, mock_bump_version: mock.Mock):
+        self.semver._scm.get_branch.return_value = "feature/example"
+        self.semver._scm.get_tag_version.return_value = "1.0.0"
+        self.semver._scm.get_version_hash.return_value = "HASH"
+        self.semver._scm.get_hash.return_value = "ALT_HASH"
+
+        mock_bump_version.return_value = "1.0.1"
+
+        expected_version = "1.0.0+HASH"
+        version = self.semver.get_version(version_format="docker")
+        self.assertEqual(version, "1.0.1-feature-example.0")
+
+    @mock.patch("semver.semver.SemVer._bump_version")
+    def test_get_version_maven(self, mock_bump_version: mock.Mock):
+        self.semver._scm.get_branch.return_value = "feature/example"
+        self.semver._scm.get_tag_version.return_value = "1.0.0"
+        self.semver._scm.get_version_hash.return_value = "HASH"
+        self.semver._scm.get_hash.return_value = "ALT_HASH"
+
+        mock_bump_version.return_value = "1.0.1"
+
+        expected_version = "1.0.1-feature-example-SNAPSHOT"
+        version = self.semver.get_version(version_format="maven")
+        self.assertEqual(version, expected_version)
+
+    def test_get_version_no_hash(self):
+        self.semver._scm.get_branch.return_value = "main"
+        self.semver._scm.get_tag_version.return_value = "1.0.0"
+        self.semver._scm.get_version_hash.return_value = "HASH"
+        self.semver._scm.get_hash.return_value = "HASH"
+
+        expected_version = "1.0.0"
+        version = self.semver.get_version()
+        self.assertEqual(version, expected_version)

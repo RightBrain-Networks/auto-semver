@@ -106,8 +106,6 @@ class Git(SCM):
 
         branch: str = self.get_branch()
 
-        logger.info(f"Main branch is {branch}")
-
         matches = self.git_commit_pattern.search(
             message.replace("\\n", "\n").replace("\\", "")
         )
@@ -140,4 +138,25 @@ class Git(SCM):
             )
 
     def tag_version(self, version: str) -> None:
+        """
+        Creates a git tag at HEAD with the given version
+        :param version: The version to tag
+        """
         self._run_command(self.git_bin, "tag", version)
+
+    def get_version_hash(self, version: str) -> str:
+        """
+        Get the hash of the commit that has the given version
+        :param version: The version to get the hash for
+        :return: The hash of the commit that has the given version
+        """
+        proc = self._run_command(self.git_bin, "rev-list", "-n", "1", version)
+        return proc.stdout.rstrip()
+
+    def get_hash(self) -> str:
+        """
+        Get the hash of the current commit
+        :return: The hash of the current commit
+        """
+        proc = self._run_command(self.git_bin, "rev-parse", "HEAD")
+        return proc.stdout.rstrip()

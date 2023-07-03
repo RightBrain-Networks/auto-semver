@@ -26,6 +26,14 @@ class SCM(ABC):
     def tag_version(self, version: str) -> None:
         raise NotImplementedError()
 
+    @abstractmethod
+    def get_version_hash(self, version: str) -> str:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_hash(self) -> str:
+        raise NotImplementedError()
+
     def get_file_version(self, config: dict) -> str:
         """
         :param config: The bumpversion config as a dict

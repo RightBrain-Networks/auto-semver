@@ -98,3 +98,20 @@ class TestMockSCM(unittest.TestCase):
 
         version = "1.0.0"
         self.scm.tag_version(version)
+
+    @mock.patch("subprocess.run")
+    def test_get_version_hash(self, mock_subprocess_run: mock.Mock):
+        mock_subprocess_run.return_value.stdout = "HASH\n"
+
+        version = "1.0.0"
+        expected_hash = "HASH"
+        version_hash = self.scm.get_version_hash(version)
+        self.assertEqual(version_hash, expected_hash)
+
+    @mock.patch("subprocess.run")
+    def test_get_hash(self, mock_subprocess_run: mock.Mock):
+        mock_subprocess_run.return_value.stdout = "HASH\n"
+
+        expected_hash = "HASH"
+        version_hash = self.scm.get_hash()
+        self.assertEqual(version_hash, expected_hash)

@@ -12,28 +12,15 @@ from semver.scm import SCM
 from semver.scm.git import Git
 
 from semver.semver import SemVer
+from semver.utils import setting_to_array
 
 from semver.exceptions import (
     NoMergeFoundException,
     NotMainBranchException,
     NoGitFlowException,
-    SemverException,
 )
 
 version = "0.0.0"
-
-
-def _setting_to_array(setting) -> List[str]:
-    """
-    Get a setting from the config file and return it as a list
-    :param setting: The setting to get from the config file
-    :return: The setting as a list
-    """
-    config: dict = toml.load("./.bumpversion.cfg")
-    semver: dict = config.get("semver", {})
-    value: str = semver.get(setting, "")
-
-    return [v.strip() for v in value.split(",") if v.strip()]
 
 
 def main():
@@ -63,10 +50,10 @@ def main():
 
     app = SemVer(
         scm=scm,
-        main_branches=_setting_to_array("main_branches"),
-        major_branches=_setting_to_array("major_branches"),
-        minor_branches=_setting_to_array("minor_branches"),
-        patch_branches=_setting_to_array("patch_branches"),
+        main_branches=setting_to_array("main_branches"),
+        major_branches=setting_to_array("major_branches"),
+        minor_branches=setting_to_array("minor_branches"),
+        patch_branches=setting_to_array("patch_branches"),
     )
 
     if args.debug:
