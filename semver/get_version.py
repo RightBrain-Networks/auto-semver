@@ -11,14 +11,14 @@ def main():
     parser.add_argument(
         "-d",
         "--dot",
-        help="Switch out / for . to be used in docker tag",
+        help="switch out / for . to be used in docker tag",
         action="store_true",
         dest="dot",
     )
     parser.add_argument(
         "-D",
         "--debug",
-        help="Sets logging level to DEBUG",
+        help="sets logging level to DEBUG",
         action="store_true",
         dest="debug",
         default=False,
@@ -26,12 +26,12 @@ def main():
     parser.add_argument(
         "-f",
         "--format",
-        help="Format for pre-release version syntax",
+        help="format for pre-release version syntax",
         choices=["npm", "maven", "docker"],
         default=None,
     )
     parser.add_argument(
-        "-b", "--build-number", help="Build number, used in pre-releases", default=0
+        "-b", "--build-number", help="build number, used in pre-releases", default=0
     )
 
     args = parser.parse_args()

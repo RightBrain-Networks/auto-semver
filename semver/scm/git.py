@@ -1,7 +1,7 @@
 import re
 import subprocess
 from typing import Union, List
-from functools import cache
+from functools import lru_cache
 
 import toml
 
@@ -29,7 +29,7 @@ class Git(SCM):
 
     def _run_command(
         self, *args: str, throwExceptions: bool = True
-    ) -> subprocess.CompletedProcess[str]:
+    ) -> subprocess.CompletedProcess:
         return subprocess.run(
             args,
             capture_output=True,
@@ -82,13 +82,17 @@ class Git(SCM):
                 f"Error getting latest tagged git version: {str(e.stderr).rstrip()}"
             )
 
-        if len(tagged_versions) > 0 and tagged_versions[-1] != "":
+        if (
+            tagged_versions is not None
+            and len(tagged_versions) > 0
+            and tagged_versions[-1] != ""
+        ):
             version = tagged_versions[-1]
 
         logger.debug(f"Tag Version: {version}")
         return version
 
-    @cache
+    @lru_cache(maxsize=None)
     def get_branch(self) -> str:
         """
         Get the main branch
@@ -97,7 +101,7 @@ class Git(SCM):
         proc = self._run_command(self.git_bin, "rev-parse", "--abbrev-ref", "HEAD")
         return proc.stdout.rstrip()
 
-    @cache
+    @lru_cache(maxsize=None)
     def get_merge_branch(self) -> Union[str, None]:
         """
         Get the branches involved in the merge

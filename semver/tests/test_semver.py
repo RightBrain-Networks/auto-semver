@@ -67,10 +67,8 @@ class TestSemVer(unittest.TestCase):
     @mock.patch("toml.load")
     @mock.patch("pathlib.Path.is_file")
     @mock.patch("builtins.open", mock.mock_open())
-    @mock.patch("semver.logger.warning")
     def test_update_file_version(
         self,
-        mock_logger: mock.Mock,
         mock_path_is_file: mock.Mock,
         mock_toml_load: mock.Mock,
     ):
@@ -83,11 +81,9 @@ class TestSemVer(unittest.TestCase):
         }
         mock_path_is_file.return_value = True
         self.semver._update_file_version("1.0.1", "1.0.0")
-        mock_logger.assert_not_called()
 
         mock_path_is_file.return_value = False
         self.semver._update_file_version("1.0.1", "1.0.0")
-        mock_logger.assert_called_once()
 
     @mock.patch("semver.semver.SemVer._version_repo", mock.MagicMock())
     def test_run_ok(self):

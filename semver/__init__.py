@@ -27,19 +27,19 @@ def main():
     """Main entry point for the application"""
     parser = argparse.ArgumentParser(description="Bump Semantic Version.")
     parser.add_argument(
-        "-n", "--no-push", help="Do not try to push", action="store_false", dest="push"
+        "-n", "--no-push", help="do not try to push", action="store_false", dest="push"
     )
     parser.add_argument(
         "-g",
         "--global-user",
-        help="Set git user at a global level, helps in jenkins",
+        help="set git user at a global level",
         action="store_true",
         dest="global_user",
     )
     parser.add_argument(
         "-D",
         "--debug",
-        help="Sets logging level to DEBUG",
+        help="sets logging level to DEBUG",
         action="store_true",
         dest="debug",
         default=False,

@@ -1,6 +1,6 @@
 from typing import List
 from pathlib import Path
-from functools import cache
+from functools import lru_cache
 import configparser
 
 import toml
@@ -8,7 +8,7 @@ import toml
 from semver.exceptions import SemverException
 
 
-@cache
+@lru_cache(maxsize=None)
 def get_settings() -> dict:
     """
     Get the settings from the config file
