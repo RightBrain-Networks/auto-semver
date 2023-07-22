@@ -1,0 +1,41 @@
+[project]
+name = "semver"
+authors = [
+    { name = "RightBrain Networks", email = "cloud@rightbrainnetworks.com"}
+]
+description = "Automatic Semantic Versioner"
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["Semantic", "Version", "Git", "Auto-Versioning"]
+license = {file = "license.txt"}
+classifiers = [
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: Apache Software License",
+        
+        # Development Status
+        "Development Status :: 3 - Alpha",
+        
+        # Audience
+        "Intended Audience :: Developers",
+        "Intended Audience :: System Administrators",
+        "Topic :: Software Development :: Build Tools"
+]
+dependencies = [
+    "toml"
+]
+dynamic = ["version"]
+
+[project.urls]
+homepage = "https://github.com/RightBrain-Networks/auto-semver"
+repository = "https://github.com/RightBrain-Networks/auto-semver"
+
+[project.scripts]
+semver = "semver:main"
+semver_get_version = "semver.get_version:main"
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+exclude = ["contrib*", "docs*", "test*"]
