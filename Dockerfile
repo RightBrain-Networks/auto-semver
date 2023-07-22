@@ -1,29 +1,33 @@
-FROM centos/python-36-centos7
- 
-USER root
+# ======= #
+# Builder #
+# ======= #
+FROM python:3.11-slim as builder
+COPY / /semver
+RUN pip wheel --no-cache-dir --wheel-dir /wheels /semver
 
-#Perform updates
-RUN pip install --upgrade pip
-RUN yum update -y
-RUN yum -y remove git
-RUN yum -y install https://packages.endpoint.com/rhel/7/os/x86_64/endpoint-repo-1.7-1.x86_64.rpm
-RUN yum -y install git
+# ======== #
+# Finalize #
+# ======== #
+FROM python:3.11-slim
 
-#Setup semver
-ADD / /semver
-WORKDIR /semver
-RUN python setup.py sdist
-RUN pip install dist/semver-*.tar.gz
+# Update and install git
+RUN apt-get update && apt-get install -y git
+
+# Create user
+RUN mkdir /semver && \
+    groupadd -g 10001 semver && \
+    useradd -u 10000 -g semver -d /semver semver \
+    && chown -R semver:semver /semver
 
 # Prep workspace
-RUN mkdir /workspace
-WORKDIR /workspace
+RUN mkdir /workspace && \
+    chown -R semver:semver /workspace
 VOLUME /workspace
 
-#Permissions
-RUN useradd -d /semverUser semverUser
-RUN chown -R semverUser:semverUser /workspace
+# Setup semver
+COPY --from=builder /wheels /semver/wheels
+RUN pip install --no-cache /semver/wheels/*
 
-CMD [ "semver" ]
-
-USER semverUser
+USER semver:semver
+WORKDIR /workspace
+ENTRYPOINT [ "semver" ]

@@ -1,41 +1,38 @@
-import subprocess
-from semver.logger import logging, logger, console_logger
+from typing import List
+from pathlib import Path
+from functools import lru_cache
+import configparser
 
-try:
-    from configparser import ConfigParser
-except ImportError:
-    # Python < 3
-    from ConfigParser import ConfigParser
+import toml
 
-try:
-    from subprocess import DEVNULL # py3k
-except ImportError:
-    import os
-    DEVNULL = open(os.devnull, 'wb')
+from semver.exceptions import SemverException
 
-def get_tag_version():
-    config = ConfigParser()
-    config.read('./.bumpversion.cfg')
-    tag_expression = config.get('bumpversion','tag_name').replace('{new_version}','[0-9]*.[0-9]*.[0-9]*')
 
-    logger.debug("Tag expression: " + str(tag_expression))
+@lru_cache(maxsize=None)
+def get_settings() -> dict:
+    """
+    Get the settings from the config file
+    :return: The settings from the config file
+    """
+    if Path("./.bumpversion.toml").is_file():
+        return toml.load("./.bumpversion.toml")
+    if Path("./.bumpversion.cfg").is_file():
+        config = configparser.ConfigParser()
+        config.read("./.bumpversion.cfg")
 
-    # Default version is `0.0.0` or what is found in 
-    version = get_file_version(config)
+        return {section: dict(config.items(section)) for section in config.sections()}
 
-    # If a version is found in tags, use that the lastest tagged version
-    tagged_versions = subprocess.Popen(['git','tag','--sort=v:refname', '-l',tag_expression],
-        stdout=subprocess.PIPE, stderr=DEVNULL, cwd=".").stdout.read().decode('utf-8').rstrip().split('\n')
-    if len(tagged_versions) > 0 and tagged_versions[-1] != "":
-        version = tagged_versions[-1]
+    raise SemverException("No config file found")
 
-    logger.debug("Tag Version: " + str(version))
-    return version
 
-def get_file_version(config):
-    version = config.get('bumpversion','current_version')
-    if not version:
-        config.set('bumpversion', 'current_version', '0.0.0')
-        version = '0.0.0'
-    return version
+def setting_to_array(setting) -> List[str]:
+    """
+    Get a setting from the config file and return it as a list
+    :param setting: The setting to get from the config file
+    :return: The setting as a list
+    """
+    config: dict = get_settings()
+    semver: dict = config.get("semver", {})
+    value: str = semver.get(setting, "")
 
+    return [v.strip() for v in value.split(",") if v.strip()]
